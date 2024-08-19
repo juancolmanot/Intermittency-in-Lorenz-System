@@ -1,0 +1,46 @@
+total_axes: 3
+layout: 3, 1
+figsize: 6, 8
+axes1:
+	plots: 1
+	data:
+		file: ../datafiles/evol_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label: -
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $evol- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $t$
+	ylabel: $x$
+axes2:
+	plots: 1
+	data:
+		file: ../datafiles/evol_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 2
+		label: -
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $evol- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $t$
+	ylabel: $y$
+axes3:
+	plots: 1
+	data:
+		file: ../datafiles/evol_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 3
+		label: -
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $evol- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $t$
+	ylabel: $z$
+save_file: evol_lorenz.pdf

@@ -1,0 +1,61 @@
+total_axes: 4
+layout: 4, 1
+figsize: 6, 16
+axes1:
+	plots: 1
+	data:
+		file: ../datafiles/pdll_theorical_lorenz.dat
+		method: scatter
+		x_col: 5
+		y_col: 2
+		color: black
+		dot_size: 0.5
+	title: $\Psi(l)\, -\, y-\, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $l$
+	ylabel: $\Psi(l)$
+axes2:
+	plots: 1	
+	data:
+		file: ../datafiles/pdll_theorical_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 3
+		color: black
+		dot_size: 0.5
+	title: $\Phi(y)\,-\,y- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $y$
+	ylabel: $\Phi(y)$
+axes3:
+	plots: 1
+	data:
+		file: ../datafiles/pdll_theorical_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 4
+		color: black
+		dot_size: 0.5
+	title: $local\, map$
+	xlabel: $y(i-1)$
+	ylabel: $y(i)$
+axes4:
+	plots: 2
+	data:
+		file: ../datafiles/pdll_theorical_lorenz.dat
+		method: scatter
+		x_col: 5
+		y_col: 1
+		color: black
+		dot_size: 0.5
+		label: l(x, c)
+	data:
+		file: ../datafiles/pdll_theorical_lorenz.dat
+		method: scatter
+		x_col: 5
+		y_col: 6
+		color: black
+		dot_size: 0.5
+		label: atan(y)	
+	title: $l(y)\,-atan(y)\,-\,y$
+	xlabel: $y$
+	ylabel: $l(y)$
+save_file: pdll_theorical_lorenz.pdf

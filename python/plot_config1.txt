@@ -1,0 +1,46 @@
+total_axes: 2
+layout: 3, 1
+figsize: 6, 8
+axes1:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_trajectory.dat
+		method: plot
+		x_col: 0
+		y_col: 1
+		label: x
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $x- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $t$
+	ylabel: $x$
+axes2:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_trajectory.dat
+		method: plot
+		x_col: 0
+		y_col: 2
+		label: y
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $y- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $t$
+	ylabel: $y$
+axes3:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_trajectory.dat
+		method: plot
+		x_col: 0
+		y_col: 3
+		label: z
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $z- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $t$
+	ylabel: $z$
+save_file: lorenz_txyz.pdf

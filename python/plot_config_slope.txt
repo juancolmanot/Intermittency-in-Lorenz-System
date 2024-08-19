@@ -1,0 +1,32 @@
+total_axes: 2
+layout: 2, 1
+figsize: 6, 9
+axes1:
+	plots: 1
+	data:
+		file: ../datafiles/m_function_slope_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label: -
+		color: black
+		dot_size: 0.1
+		linewidth: 0.5
+	title: $M(x)$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes2:
+	plots: 1
+	data:
+		file: ../datafiles/m_function_slope_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 2
+		label: -
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $\frac{dM(x)}{dx}$
+	xlabel: $x$
+	ylabel: $\frac{dM(x)}{dx}$
+save_file: ../plots/test_m_slope_lorenz.pdf

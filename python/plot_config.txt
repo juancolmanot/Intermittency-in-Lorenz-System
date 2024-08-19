@@ -1,0 +1,46 @@
+total_axes: 2
+layout: 2, 1
+figsize: 6, 7
+axes1:
+	plots: 2
+	data:
+		file: kimkye_theoric1_rpd_M_2d.dat
+		method: plot
+		x_col: 0
+		y_col: 1
+		label: theoric
+		color: blue
+		dot_size: 1
+	data:
+		file: kimkye_rpd1_2d.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label: numeric
+		color: red
+		dot_size: 1
+	title: $\phi(x) \, - \,x \, - \, \alpha=0.689 \, - \, crossed$
+	xlabel: $x$
+	ylabel: $\phi(x)$
+axes2:
+	plots: 2
+	data:
+		file: kimkye_theoric1_rpd_M_2d.dat
+		method: plot
+		x_col: 0
+		y_col: 2
+		label: theoric
+		color: blue
+		dot_size: 1
+	data:
+		file: kimkye_M1_2d.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label: numeric
+		color: red
+		dot_size: 1
+title: $M(x) \, - \, x \, - \alpha=0.689\, - \, crossed$
+	xlabel: $x$
+	ylabel: $M(x)$
+save_file: kk_rpd_M_theoric_v_num_2d1.pdf

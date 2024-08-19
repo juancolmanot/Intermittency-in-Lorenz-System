@@ -37,8 +37,8 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     // We load parameters in params1 variable
     // ===============================================================================
-    Parameters5 params;
-    load_parameters_from_file(params_file, &params, handler5);
+    Parameters6 params;
+    load_parameters_from_file(params_file, &params, handler6);
 
     // ===============================================================================
     // File to write to
@@ -65,10 +65,7 @@ int main(int argc, char *argv[]) {
     x0[0] = 2.0;
     x0[1] = -1.0;
     x0[2] = 150.0;
-    double perturbation_range[n];
-    for (unsigned int i = 0; i < n; i++) {
-        perturbation_range[i] = x0[i] * 0.01;
-    }
+    double perturbation_range = 1.0;
 
     // ===============================================================================
     // Threads.
@@ -80,7 +77,10 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     double yf = 41.2861;
     double clam = 1.85;
-    unsigned int rtarget_per_thread = 40000;
+    double ymin, ymax;
+    ymin = params.xmin;
+    ymax = params.xmax;
+    unsigned int rtarget_per_thread = params.rtarget;
     unsigned int total_rtarget = rtarget_per_thread * num_threads;
     double yreinj[total_rtarget][2];
 
@@ -88,11 +88,21 @@ int main(int argc, char *argv[]) {
     // Integrate stationary state.
     // ===============================================================================
     omp_set_num_threads((int)num_threads);
-    #pragma omp parallel
+    int stop_signal = 0;
+    #pragma omp parallel shared(stop_signal)
     {
         // Get the thread ID and number of threads
         unsigned int thread_id = (unsigned int)omp_get_thread_num();
         unsigned int thread_num = (unsigned int)omp_get_num_threads();
+
+        // ===============================================================================
+        // Error and overflow contention parameters.
+        // ===============================================================================
+        double ymax_allow = 300.0;
+        long unsigned int steps = 0, max_steps = params.max_steps;
+        double max_runtime = 40.0 * 60.0; //(45 minutes)
+        time_t start_time;
+        time(&start_time);
 
         // ===============================================================================
         // Instanciate parameters for system.
@@ -110,7 +120,7 @@ int main(int argc, char *argv[]) {
         // ===============================================================================
         double x[n];
         for (size_t i = 0; i < n; ++i) {
-            x[i] = x0[i] + gsl_ran_gaussian(rng, perturbation_range[i]);
+            x[i] = x0[i] + gsl_ran_gaussian(rng, perturbation_range);
         }
 
         // ===============================================================================
@@ -130,6 +140,7 @@ int main(int argc, char *argv[]) {
             
             if (status != GSL_SUCCESS) {
                 printf("error: %d\n", status);
+                printf("GSL error: %s\n", gsl_strerror(status));
             }
         }
 
@@ -151,6 +162,7 @@ int main(int argc, char *argv[]) {
             yfit[i] = x[1];
             if (status != GSL_SUCCESS) {
                 printf("error initializing, return value=%d\n", status);
+                printf("GSL error: %s\n", gsl_strerror(status));
                 break;
             }
         }
@@ -158,10 +170,18 @@ int main(int argc, char *argv[]) {
         time_t tprev, tnow;
         time(&tprev);
         unsigned int local_rcount = 0;
-
+        time_t current_time;
+        time(&current_time);
+        double elapsed_time = difftime(current_time, start_time);
         while (local_rcount < rtarget_per_thread) {
             int status = gsl_odeiv2_evolve_apply(e, c, s, &sys, &t, t_stationary, &h, x);
             
+            time_t current_time;
+            time(&current_time);
+            elapsed_time = difftime(current_time, start_time);
+            #pragma omp atomic
+            steps++;
+
             xfit[0] = xfit[1];
             xfit[1] = xfit[2];
             xfit[2] = x[0];
@@ -174,12 +194,20 @@ int main(int argc, char *argv[]) {
                 if (xfit[1] > xp) {
                     quadratic_regression(xfit, yfit, 3, ci);
                     yreg[1] = (double)(ci[0] * xp * xp + ci[1] * xp + ci[2]);
-                    if (yreg[1] >= yf - clam && yreg[1] <= yf + clam) {
-                        if (yreg[0] < yf - clam || yreg[0] > yf + clam) {
-                            unsigned int index = thread_id * rtarget_per_thread + local_rcount;
-                            yreinj[index][0] = yreg[0];
-                            yreinj[index][1] = yreg[1];
-                            local_rcount++;
+                    if (yreg[0] > ymin && yreg[0] < ymax){
+                        if (yreg[1] >= yf - clam && yreg[1] <= yf + clam) {
+                            if (yreg[0] < yf - clam || yreg[0] > yf + clam) {
+                                if (fabs(yreg[0]) < ymax_allow && fabs(yreg[1]) < ymax_allow) {
+                                    unsigned int index = thread_id * rtarget_per_thread + local_rcount;
+                                    yreinj[index][0] = yreg[0];
+                                    yreinj[index][1] = yreg[1];
+                                    local_rcount++;
+                                }
+                                else {
+                                    printf("Unrealistic value encountered: yreg[0]=%f, yreg[1]=%f\n", yreg[0], yreg[1]);
+                                    stop_signal = 1;
+                                }
+                            }
                         }
                     }
                     yreg[0] = yreg[1];
@@ -192,13 +220,36 @@ int main(int argc, char *argv[]) {
                 {
                     printf("Thread: %d, ", thread_id);
                     printf("reinject count: %d, ", local_rcount);
-                    printf("%% completed: %3.2f %%\n", (double)local_rcount * 100.0 / (double)rtarget_per_thread);
+                    printf("%% completed: %3.2f ,%% ", (double)local_rcount * 100.0 / (double)rtarget_per_thread);
+                    printf("%% steps realized: %3.2f%%, ", (double)steps * 100.0 / (double)max_steps);
+                    printf("%% time elapsed: %3.2f%%\n", elapsed_time  * 100.0 / max_runtime);
                 }
                 tprev = tnow;
             }
 
             if (status != GSL_SUCCESS) {
                 printf("error: %d\n", status);
+                printf("GSL error: %s\n", gsl_strerror(status));
+                stop_signal = 1;
+            }
+
+            if (elapsed_time > max_runtime) {
+                #pragma omp critical
+                {
+                    printf("Maximum runtime exceeded. Exiting.\n");
+                    stop_signal = 1;
+                }
+            }
+
+            if (steps >= max_steps) {
+                #pragma omp critical
+                {
+                    printf("Maximum steps exceeded. Exiting.\n");
+                    stop_signal = 1;
+                }
+            }
+
+            if (stop_signal) {
                 break;
             }
         }
@@ -215,17 +266,12 @@ int main(int argc, char *argv[]) {
     // Write results to file.
     // ===============================================================================
     for (unsigned int i = 0; i < total_rtarget; i++) {
-        if (fabs((yreinj[i][0]) - 0.0) > 1e-7 && fabs((yreinj[i][1]) - 0.0) > 1e-7){
-            fprintf(f, "%12.5E %12.5E %12.5E %12.5E\n",
+        fprintf(f, "%12.5E %12.5E %12.5E %12.5E\n",
             yreinj[i][0],
             yreinj[i][1],
             yreinj[i][0] - yf,
             yreinj[i][1] - yf
         );
-        }
-        else {
-            printf("%12.5E %12.5E\n", yreinj[i][0] - yf, yreinj[i][1] - yf);
-        }
     }
 
     // ===============================================================================
@@ -238,4 +284,4 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     printf("Process finished. Results stored in %s\n", write_filename);
     return 0;
-}   
+}

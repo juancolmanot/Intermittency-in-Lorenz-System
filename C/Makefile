@@ -16,7 +16,7 @@ COMMON_INCDIR = ../../common/include
 MAIN =
 
 # Libraries
-LDLIBS = -lgsl -lgslcblas -lopenblas -lm
+LDLIBS = -lgsl -lgslcblas -lopenblas -lm -fopenmp
 
 # Compile flags
 # ====================================================================
@@ -29,7 +29,7 @@ flag_o01 = -O3 -ftree-vectorize -ftree-loop-vectorize -funroll-loops
 flag_o02 = -march=native -Ofast -ffast-math
 flag_o03 = -fopt-info-vec -ftree-vectorizer-verbose=2
 
-CFLAGS = ${flag_o01} ${flag_o02} ${flag_w01} ${flag_d01} ${flag_o03}
+CFLAGS = ${flag_o01} ${flag_o02} ${flag_w01} ${flag_d01} ${flag_o03} ${OMP}
 
 # Header files (local and common)
 LOCAL_HEADERS_LIST = $(LOCAL_HEADERS)

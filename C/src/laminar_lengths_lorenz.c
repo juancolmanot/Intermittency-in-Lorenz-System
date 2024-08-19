@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     x0[2] = 150.0;
     double perturbation_range[n];
     for (unsigned int i = 0; i < n; i++) {
-        perturbation_range[i] = x0[i] * 0.01;
+        perturbation_range[i] = x0[i] * 0.001;
     }
 
     // ===============================================================================
@@ -80,9 +80,13 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     double yf = 41.2861;
     double clam = 1.85;
-    unsigned int rtarget_per_thread = 40000;
-    unsigned int total_rtarget = rtarget_per_thread * num_threads;
-    double yreinj[total_rtarget][2];
+    unsigned int ltarget_per_thread = 20000;
+    unsigned int total_ltarget = ltarget_per_thread * num_threads;
+    double ylaminar[total_ltarget], yreinj[total_ltarget];
+    for (unsigned int i = 0; i < total_ltarget; i++) {
+        ylaminar[total_ltarget] = 0.0;
+        yreinj[total_ltarget] = 0.0;
+    }
 
     // ===============================================================================
     // Integrate stationary state.
@@ -137,7 +141,7 @@ int main(int argc, char *argv[]) {
         // Arrays for interpolation and map.
         // ===============================================================================
         long double xfit[n], yfit[n];
-        double yreg[2];
+        double yreg[2], yr;
         yreg[0] = yreg[1] = 0.0;
         double xp = 0;
         long double ci[n];
@@ -157,11 +161,18 @@ int main(int argc, char *argv[]) {
 
         time_t tprev, tnow;
         time(&tprev);
-        unsigned int local_rcount = 0;
+        unsigned int local_lcount = 0, local_iter = 0;
+        unsigned int start_laminar = 0, laminar = 0;
 
-        while (local_rcount < rtarget_per_thread) {
+        // ===============================================================================
+        // Evolve system.
+        // ===============================================================================
+        while (local_lcount < ltarget_per_thread) {
             int status = gsl_odeiv2_evolve_apply(e, c, s, &sys, &t, t_stationary, &h, x);
             
+            // ===============================================================================
+            // Store inmediate points for fitting.
+            // ===============================================================================
             xfit[0] = xfit[1];
             xfit[1] = xfit[2];
             xfit[2] = x[0];
@@ -170,29 +181,57 @@ int main(int argc, char *argv[]) {
             yfit[1] = yfit[2];
             yfit[2] = x[1];
 
+            // ===============================================================================
+            // Ask for passing through Poincaré section.
+            // ===============================================================================
             if (xfit[0] < xp) {
                 if (xfit[1] > xp) {
+                    // Count one more iteration of the map
+                    local_iter++;
+                    // Fit point in section
                     quadratic_regression(xfit, yfit, 3, ci);
                     yreg[1] = (double)(ci[0] * xp * xp + ci[1] * xp + ci[2]);
+                    // =======================================================================
+                    // Check for reinjection and start counting laminar iterations.
+                    // =======================================================================
                     if (yreg[1] >= yf - clam && yreg[1] <= yf + clam) {
                         if (yreg[0] < yf - clam || yreg[0] > yf + clam) {
-                            unsigned int index = thread_id * rtarget_per_thread + local_rcount;
-                            yreinj[index][0] = yreg[0];
-                            yreinj[index][1] = yreg[1];
-                            local_rcount++;
+                            if (laminar == 0) {
+                                start_laminar = local_iter;
+                                laminar = 1;
+                                yr = yreg[1];
+                            }
                         }
                     }
+                    // =======================================================================
+                    // Check for ejection and store amount of iterations in ylaminar[].
+                    // =======================================================================
+                    if (yreg[0] >= yf - clam && yreg[0] <= yf + clam) {
+                        if (yreg[1] < yf - clam || yreg[1] > yf + clam) {
+                            if (laminar == 1) {
+                                unsigned int index = thread_id * ltarget_per_thread + local_lcount;
+                                ylaminar[index] = local_iter - start_laminar;
+                                yreinj[index] = yr;
+                                local_lcount++;
+                                laminar = 0;
+                            }                            
+                        }
+                    }
+
                     yreg[0] = yreg[1];
                 }
             }
-
+            
+            // ===============================================================================
+            // Print progress made.
+            // ===============================================================================
             time(&tnow);
             if (difftime(tnow, tprev) > 2) {
                 #pragma omp critical
                 {
                     printf("Thread: %d, ", thread_id);
-                    printf("reinject count: %d, ", local_rcount);
-                    printf("%% completed: %3.2f %%\n", (double)local_rcount * 100.0 / (double)rtarget_per_thread);
+                    printf("laminar count: %d, ", local_lcount);
+                    printf("%% completed: %3.2f %%\n", (double)local_lcount * 100.0 / (double)ltarget_per_thread);
                 }
                 tprev = tnow;
             }
@@ -214,17 +253,9 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     // Write results to file.
     // ===============================================================================
-    for (unsigned int i = 0; i < total_rtarget; i++) {
-        if (fabs((yreinj[i][0]) - 0.0) > 1e-7 && fabs((yreinj[i][1]) - 0.0) > 1e-7){
-            fprintf(f, "%12.5E %12.5E %12.5E %12.5E\n",
-            yreinj[i][0],
-            yreinj[i][1],
-            yreinj[i][0] - yf,
-            yreinj[i][1] - yf
-        );
-        }
-        else {
-            printf("%12.5E %12.5E\n", yreinj[i][0] - yf, yreinj[i][1] - yf);
+    for (unsigned int i = 0; i < total_ltarget; i++) {
+        if (ylaminar[i] >= 0.0 && yreinj[i] > 0.0) {
+            fprintf(f, "%5.5f %5.5f %5.5f\n", ylaminar[i], yreinj[i], yreinj[i] - yf);
         }
     }
 

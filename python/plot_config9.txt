@@ -1,0 +1,51 @@
+total_axes: 2
+layout: 2, 1
+figsize: 6, 6
+axes1:
+	plots: 2
+	data:
+		file: ../datafiles/m_tn_lorenz_5_zones.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label: numeric
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	data:
+		file: ../datafiles/m_tn_lorenz_5_zones.dat
+		method: plot
+		x_col: 0
+		y_col: 2
+		label: theoric
+		color: red
+		dot_size: 1
+		linewidth: 0.5
+	title: $M(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes2:
+	plots: 2
+	data:
+		file: ../datafiles/rpd_tn_lorenz_5_zones.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label: numeric
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	data:
+		file: ../datafiles/rpd_tn_lorenz_5_zones.dat
+		method: plot
+		x_col: 0
+		y_col: 2
+		label: theoric
+		color: red
+		dot_size: 1
+		linewidth: 0.5
+	title: $\Phi(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+	ylim: [0, 5]
+save_file: rpd_m_tn_lorenz_5_zones.pdf

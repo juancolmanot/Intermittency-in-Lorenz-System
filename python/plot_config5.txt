@@ -1,0 +1,59 @@
+total_axes: 4
+layout: 4, 1
+figsize: 6, 12
+axes1:
+	plots: 1
+	data:
+		file: ../datafiles/reinjection_lorenz_gsl_omp.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label: -
+		color: black
+		dot_size: 0.1
+		linewidth: 0.5
+	title: $reinjected- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $x(i-1)$
+	ylabel: $x(i)$
+axes2:
+	plots: 1
+	data:
+		file: ../datafiles/m_function_slope_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label: -
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $M(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes3:
+	plots: 1
+	data:
+		file: ../datafiles/m_function_slope_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 2
+		label:
+		color: black
+		dot_size: 1
+	title: $\frac{dM(x)}{x}- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0/$
+	xlabel: $x$
+	ylabel: $\frac{dM(x)}{x}$		
+axes4:
+	plots: 1
+	data:
+		file: ../datafiles/rpd_numerical_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label: -
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $\Phi(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+save_file: ../plots/reinj_m_slope_rpd_regions_numerical_lorenz.pdf

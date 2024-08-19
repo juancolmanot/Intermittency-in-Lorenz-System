@@ -68,12 +68,16 @@ int main(int argc, char *argv[]) {
     double perturbation_range = 1.0;
 
     // ===============================================================================
+    // Thread num.
+    // ===============================================================================
+    unsigned int num_threads = 4;  // Number of threads (adjust if necessary)
+
+    // ===============================================================================
     // Reinjection parameters.
     // ===============================================================================
     double yf = 41.2861;
     double clam = 1.85;
-    unsigned int rtarget_per_thread = 10000;
-    unsigned int num_threads = 2;  // Number of threads (adjust if necessary)
+    unsigned int rtarget_per_thread = 20000;
     unsigned int total_rtarget = rtarget_per_thread * num_threads;
     double yreinj[total_rtarget];
 
@@ -81,7 +85,6 @@ int main(int argc, char *argv[]) {
     // Integrate stationary state.
     // ===============================================================================
     omp_set_num_threads((int)num_threads);
-    //unsigned int rcount = 0;
     #pragma omp parallel
     {
         // Get the thread ID and number of threads
@@ -183,7 +186,9 @@ int main(int argc, char *argv[]) {
             if (difftime(tnow, tprev) > 2) {
                 #pragma omp critical
                 {
-                    printf("Thread %d: reinject count: %d, %% completed: %3.2f %%\n", thread_id, local_rcount, (double)local_rcount * 100.0 / (double)rtarget_per_thread);
+                    printf("Thread: %d, ", thread_id);
+                    printf("reinject count: %d, ", local_rcount);
+                    printf("%% completed: %3.2f %%\n", (double)local_rcount * 100.0 / (double)rtarget_per_thread);
                 }
                 tprev = tnow;
             }
@@ -200,7 +205,6 @@ int main(int argc, char *argv[]) {
         gsl_odeiv2_evolve_free(e);
         gsl_odeiv2_control_free(c);
         gsl_odeiv2_step_free(s);
-        fclose(f);
     }
 
     // ===============================================================================
@@ -219,8 +223,7 @@ int main(int argc, char *argv[]) {
     // Write results to file.
     // ===============================================================================
     for (unsigned int i = 0; i < nbins; i++) {
-        printf("%5.5f %5.5f\n", bins[i], rpd[i]);
-        fprintf(f, "%5.5f %5.5f\n", bins[i], rpd[i]);
+        fprintf(f, "%5.5f %5.5f\n", bins[i], rpd[i] / (double)total_rtarget);
     }
 
     // ===============================================================================

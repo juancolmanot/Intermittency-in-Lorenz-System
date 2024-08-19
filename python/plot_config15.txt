@@ -1,0 +1,40 @@
+total_axes: 3
+layout: 3, 1
+figsize: 6, 12
+axes1:
+	plots: 1
+	data:
+		file: ../datafiles/rpd_numerical_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		color: black
+		dot_size: 0.3
+	title: $\Phi(y)\,- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $y$
+	ylabel: $\Phi(y)$
+axes2:
+	plots: 1
+	data:
+		file: ../datafiles/rpd_numerical_lorenz.dat
+		method: scatter
+		x_col: 2
+		y_col: 3
+		color: black
+		dot_size: 0.3
+	title: $\Phi(y - yf)\,- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $y - yf$
+	ylabel: $\Phi(y - yf)$
+axes3:
+	plots: 1
+	data:
+		file: ../datafiles/rpd_numerical_lorenz.dat
+		method: scatter
+		x_col: 4
+		y_col: 5
+		color: black
+		dot_size: 0.3
+	title: $\Phi(|y - yf|)\,- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $|y - yf|$
+	ylabel: $\Phi(|y - yf|)$
+save_file: rpd_numerical_lorenz_3.pdf

@@ -1,0 +1,28 @@
+total_axes: 2
+layout: 2, 1
+figsize: 6, 8
+axes1:
+	plots: 1
+	data:
+		file: ../datafiles/pdll_numerical_lorenz.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		color: black
+		dot_size: 0.5
+	title: $\Psi(l)\,-l\,\sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $l$
+	ylabel: $\Psi(l)$
+axes2:
+	plots: 1
+	data:	
+		file: ../datafiles/laminar_lengths_lorenz_gsl_omp.dat
+		method: scatter
+		x_col: 0
+		y_col: 2
+		color: black
+		dot_size: 0.5
+	title: $X(l)\,-l\,\sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $l$
+	ylabel: $X(l)$
+save_file: pdll_xl_numerical_lorenz.pdf

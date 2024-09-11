@@ -4,10 +4,10 @@ figsize: 6, 3
 axes1:
 	plots: 2
 	data:
-		file: ../datafiles/rpd_theorical_lorenz_5reg.dat
+		file: ../datafiles/rpd_theoretical_lorenz_5reg.dat
 		method: scatter
 		x_col: 0
-		y_col: 1
+		y_col: 2
 		label: numeric
 		color: black
 		dot_size: 0.3
@@ -15,10 +15,10 @@ axes1:
 		marker: o
 		every_n: 1
 	data:
-		file: ../datafiles/rpd_theorical_lorenz_5reg.dat
+		file: ../datafiles/rpd_theoretical_lorenz_5reg.dat
 		method: scatter
-		x_col: 0
-		y_col: 2
+		x_col: 1
+		y_col: 3
 		label: theoric
 		color: red
 		dot_size: 0.5
@@ -28,6 +28,6 @@ axes1:
 	title: $\Phi(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
 	xlabel: $x$
 	ylabel: $\Phi(x)$
-	ylim: [0, 5]
+	ylim: [1e-5, 5]
 	yscale: linear
-save_file: rpd_theoretical_lorenz.pdf
+save_file: rpd_theoretical_lorenz_2.pdf

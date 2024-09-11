@@ -1,0 +1,144 @@
+total_axes: 10
+layout: 5, 2
+figsize: 12, 20 
+axes1:
+	plots: 1
+	data:l
+		file: ../datafiles/errors_lorenz_1_m_0.dat
+		method: scatter
+		x_col: 1
+		y_col: 4
+		color: black
+		dot_size: 0.5
+		marker: ^
+	title: err-$M1(x)$
+	ylabel: abs-err-$M1(x)$
+	xlabel: $x$
+	yscale: log
+axes2:
+	plots: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_rpd_0.dat
+		method: scatter
+		x_col: 1
+		y_col: 4
+		color: red
+		dot_size: 1
+		marker: ^
+	title: err-$\Phi1(x)$
+	ylabel: abs-err-$\Phi1(x)$
+	xlabel: $x$
+	yscale: log
+axes3:
+	plots: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_m_1.dat
+		method: scatter
+		x_col: 1
+		y_col: 4
+		color: black
+		dot_size: 0.5
+		marker: ^
+	title: err-$M2(x)$
+	ylabel: abs-err-$M2(x)$
+	xlabel: $x$
+	yscale: log
+axes4:
+	plots: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_rpd_1.dat
+		method: scatter
+		x_col: 1
+		y_col: 4
+		color: red
+		dot_size: 1
+		marker: ^
+	title: err-$\Phi2(x)$
+	ylabel: abs-err-$\Phi2(x)$
+	xlabel: $x$
+	yscale: log
+axes5:
+	plots: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_m_2.dat
+		method: scatter
+		x_col: 1
+		y_col: 4
+		color: black
+		dot_size: 0.5
+		marker: ^
+	title: err-$M3(x)$
+	ylabel: abs-err-$M3(x)$
+	xlabel: $x$
+	yscale: log
+axes6:
+	plots: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_rpd_2.dat
+		method: scatter
+		x_col: 1
+		y_col: 4
+		color: red
+		dot_size: 1
+		marker: ^
+	title: err-$\Phi3(x)$
+	ylabel: abs-err-$\Phi3(x)$
+	xlabel: $x$
+	yscale: log
+axes7:
+	plots: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_m_3.dat
+		method: scatter
+		x_col: 1
+		y_col: 4
+		color: black
+		dot_size: 0.5
+		marker: ^
+	title: err-$M4(x)$
+	ylabel: abs-err-$M4(x)$
+	xlabel: $x$
+	yscale: log
+axes8:
+	plots: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_rpd_3.dat
+		method: scatter
+		x_col: 1
+		y_col: 4
+		color: red
+		dot_size: 1
+		marker: ^
+	title: err-$\Phi4(x)$
+	ylabel: abs-err-$\Phi4(x)$
+	xlabel: $x$
+	yscale: log
+axes9:
+	plots: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_m_4.dat
+		method: scatter
+		x_col: 1
+		y_col: 4
+		color: black
+		dot_size: 0.5
+		marker: ^
+	title: err-$M5(x)$
+	ylabel: abs-err-$M5(x)$
+	xlabel: $x$
+	yscale: log
+axes10:
+	plots: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_rpd_4.dat
+		method: scatter
+		x_col: 1
+		y_col: 4
+		color: red
+		dot_size: 1
+		marker: ^
+	title: err-$\Phi5(x)$
+	ylabel: abs-err-$\Phi5(x)$
+	xlabel: $x$
+	yscale: log
+save_file: err_m_rpd_lorenz_all.pdf

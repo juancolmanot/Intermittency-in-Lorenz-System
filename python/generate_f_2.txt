@@ -1,0 +1,3 @@
+xmin: 25.975
+xmax: 26.85
+n_points: 300

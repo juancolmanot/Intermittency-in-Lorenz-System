@@ -1,0 +1,124 @@
+total_axes: 5
+layout: 5, 1
+figsize: 6, 20 
+axes1:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_m_0.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_m_0.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $M1(x)$
+	xlabel: $x$
+	ylabel: $M1(x)$
+	xscale: log
+	yscale: log
+axes2:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_m_1.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_m_1.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $M2(x)$
+	xlabel: $x$
+	ylabel: $M2(x)$
+	xscale: log
+	yscale: log
+axes3:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_m_2.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_m_2.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $M3(x)$
+	xlabel: $x$
+	ylabel: $M3(x)$
+	xscale: log
+	yscale: log
+axes4:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_m_3.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_m_3.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $M4(x)$
+	xlabel: $x$
+	ylabel: $M4(x)$
+	xscale: log
+	yscale: log
+axes5:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_m_4.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_m_4.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $M5(x)$
+	xlabel: $x$
+	ylabel: $M5(x)$
+	xscale: log
+	yscale: log
+save_file: m_num_theo_lorenz_scaled_all.pdf

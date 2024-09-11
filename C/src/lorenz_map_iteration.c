@@ -1,11 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
-#include <time.h>
-#include "../include/lorenz.h"
+#include <stdlib.h>
+#include <string.h>
 #include "../../../common/include/file_handle.h"
-#include "../../../common/include/stats.h"
-#include "../../../common/include/linear_algebra.h"
 
 int main(int argc, char *argv[]) {
 
@@ -37,42 +34,19 @@ int main(int argc, char *argv[]) {
     FILE *f = open_file(write_filename);
 
     // ===============================================================================
-    // Fixed point.
-    // ===============================================================================
-    double yf = 41.2861;
-
-    // ===============================================================================
     // Load reinjected points.
     // ===============================================================================
-    double *xreinj = calloc(rows, sizeof(double));
-    double *xreinj_fp = calloc(rows, sizeof(double));
-    for (unsigned int i = 0; i < rows; i++) {
-        xreinj[i] = data[i][1];
-        xreinj_fp[i] = data[i][1] -  yf;
+    size_t n_map = 4;
+    for (unsigned int i = 0; i < rows - n_map; i++) {
+        if (data[i][0] != 0.0 && data[i + n_map][0]) {
+            fprintf(f, "%12.5E %12.5E %12.5E\n",
+                (double)i,
+                data[i][0],
+                data[i + n_map][0]
+            );            
+        }
     }
 
-    // ===============================================================================
-    // Sort reinjected points.
-    // ===============================================================================
-    bubble_sort_double_unsigned(xreinj, rows);
-    bubble_sort_double_unsigned(xreinj_fp, rows);
-
-    // ===============================================================================
-    // Compute M function
-    // ===============================================================================
-    double Mi = 0.0, Mi_fp = 0.0;
-    for (unsigned int i = 0; i < rows; i++) {
-        Mi += xreinj[i];
-        Mi_fp += xreinj_fp[i];
-        fprintf(f, "%12.5E %12.5E %12.5E %12.5E %12.5E %12.5E\n",
-            xreinj[i],
-            Mi / (double)(i + 1),
-            xreinj_fp[i],
-            Mi_fp / (double)(i + 1),
-            xreinj[i] - xreinj[0],
-            (Mi / (double)(i + 1)) - (xreinj[0] / 1.0)
-        );
-    }
 
     // ===============================================================================
     // Free memory.
@@ -81,8 +55,6 @@ int main(int argc, char *argv[]) {
         free(data[i]);
     }
     free(data);
-    free(xreinj);
-    free(xreinj_fp);
     fclose(f);
 
     // ===============================================================================

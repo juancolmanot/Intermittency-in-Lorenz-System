@@ -1,0 +1,124 @@
+total_axes: 5
+layout: 5, 1
+figsize: 6, 20 
+axes1:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_rpd_0.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_rpd_0.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $\Phi1(x)$
+	xlabel: $x$
+	ylabel: $\Phi1(x)$
+	xscale: log
+	yscale: log
+axes2:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_rpd_1.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_rpd_1.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $\Phi2(x)$
+	xlabel: $x$
+	ylabel: $\Phi2(x)$
+	xscale: log
+	yscale: log
+axes3:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_rpd_2.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_rpd_2.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $\Phi3(x)$
+	xlabel: $x$
+	ylabel: $\Phi3(x)$
+	xscale: log
+	yscale: log
+axes4:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_rpd_3.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_rpd_3.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $\Phi4(x)$
+	xlabel: $x$
+	ylabel: $\Phi4(x)$
+	xscale: log
+	yscale: log
+axes5:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_rpd_4.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_scaled_rpd_4.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $\Phi5(x)$
+	xlabel: $x$
+	ylabel: $\Phi5(x)$
+	xscale: log
+	yscale: log
+save_file: rpd_num_theo_lorenz_scaled_all.pdf

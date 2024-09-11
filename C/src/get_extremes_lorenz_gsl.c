@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <time.h>
 #include <omp.h>
+#include <float.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_matrix.h>
@@ -37,8 +37,8 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     // We load parameters in params1 variable
     // ===============================================================================
-    Parameters6 params;
-    load_parameters_from_file(params_file, &params, handler6);
+    Parameters5 params;
+    load_parameters_from_file(params_file, &params, handler5);
 
     // ===============================================================================
     // File to write to
@@ -52,6 +52,10 @@ int main(int argc, char *argv[]) {
     double atol, rtol;
     atol = params.atol;
     rtol = params.rtol;
+    double t, t_transient, t_stationary;
+    t = 0.0;
+    t_transient = params.t_transient;
+    t_stationary = t_transient + params.t_stationary;
 
     // ===============================================================================
     // Initial state.
@@ -72,16 +76,19 @@ int main(int argc, char *argv[]) {
     unsigned int num_threads = 4;  // Number of threads (adjust if necessary)
 
     // ===============================================================================
-    // Reinjection parameters.
+    // Common min and max array.
     // ===============================================================================
-    double yf = 41.2861;
-    double clam = 1.85;
-    unsigned int rtarget_per_thread = params.rtarget;
-    unsigned int total_rtarget = rtarget_per_thread * num_threads;
-    double yreinj[total_rtarget][3];
-    double ymin, ymax;
-    ymin = params.xmin;
-    ymax = params.xmax;
+    double common_min_values[n][4], common_max_values[n][4];
+    double min_minimorum[n], max_maximorum[n];
+    // Fill max and min arrays.
+    for (size_t i = 0; i < n; i++) {
+        min_minimorum[i] = DBL_MAX;
+        max_maximorum[i] = -DBL_MAX;
+        for (size_t j = 0; j < num_threads; j++) {
+            common_min_values[i][j] = DBL_MAX;
+            common_max_values[i][j] = -DBL_MAX;    
+        }
+    }
 
     // ===============================================================================
     // Integrate stationary state.
@@ -102,7 +109,7 @@ int main(int argc, char *argv[]) {
         // Initialize random number generator
         // ===============================================================================
         gsl_rng *rng = gsl_rng_alloc(gsl_rng_default);
-        gsl_rng_set(rng, (long unsigned int)time(NULL) + (long unsigned int)thread_num);
+        gsl_rng_set(rng, (long unsigned int)omp_get_wtime() + (long unsigned int)thread_num);
 
         // ===============================================================================
         // Apply perturbation to initial conditions
@@ -111,14 +118,6 @@ int main(int argc, char *argv[]) {
         for (size_t i = 0; i < n; ++i) {
             x[i] = x0[i] + gsl_ran_gaussian(rng, perturbation_range[i]);
         }
-
-        // ===============================================================================
-        // Integration parameters.
-        // ===============================================================================
-        double t, t_transient, t_stationary;
-        t = 0.0;
-        t_transient = params.t_transient;
-        t_stationary = t_transient + params.t_stationary;
 
         // ===============================================================================
         // Preparing integrator.
@@ -140,100 +139,38 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        // ===============================================================================
-        // Arrays for interpolation and map.
-        // ===============================================================================
-        long double xfit[n], yfit[n], zfit[n];
-        double yreg[3], zreg;
-        yreg[0] = yreg[1] = zreg = 0.0;
-        double xp = 0;
-        long double ci[n];
+        double tprev = omp_get_wtime();
 
-        // ===============================================================================
-        // Fill first three points.
-        // ===============================================================================
-        for (unsigned int i = 1; i < 3; i++) {
+        while (t < t_stationary) {
             int status = gsl_odeiv2_evolve_apply(e, c, s, &sys, &t, t_stationary, &h, x);
-            xfit[i] = x[0];
-            yfit[i] = x[1];
-            zfit[i] = x[2];
-            if (status != GSL_SUCCESS) {
-                printf("error initializing, return value=%d\n", status);
-                break;
-            }
-        }
 
-        time_t tprev, tnow;
-        time(&tprev);
-        unsigned int local_rcount = 0;
-        unsigned long int iteration_count = 0;
-
-        while (local_rcount < rtarget_per_thread) {
-            iteration_count++;
-            int status = gsl_odeiv2_evolve_apply(e, c, s, &sys, &t, t_stationary, &h, x);
-            
-            xfit[0] = xfit[1];
-            xfit[1] = xfit[2];
-            xfit[2] = x[0];
-
-            yfit[0] = yfit[1];
-            yfit[1] = yfit[2];
-            yfit[2] = x[1];
-
-            zfit[0] = zfit[1];
-            zfit[1] = zfit[2];
-            zfit[2] = x[2];
-
-            if (xfit[0] < xp) {
-                if (xfit[1] > xp) {
-                    quadratic_regression(xfit, yfit, 3, ci);
-                    yreg[1] = (double)(ci[0] * xp * xp + ci[1] * xp + ci[2]);
-                    quadratic_regression(xfit, zfit, 3, ci);
-                    zreg = (double)(ci[0] * xp * xp + ci[1] * xp + ci[2]);
-                    if (yreg[1] >= yf - clam && yreg[1] <= yf + clam) {
-                        if (yreg[0] < yf - clam || yreg[0] > yf + clam) {
-                            if (yreg[0] >= ymin && yreg[0] < ymax){
-                                unsigned int index = thread_id * rtarget_per_thread + local_rcount;
-                                yreinj[index][0] = yreg[0];
-                                yreinj[index][1] = yreg[1];
-                                yreinjected[index][2] = zreg;
-                                local_rcount++;    
-                            }
-                        }
-                    }
-                    yreg[0] = yreg[1];
-                }
-            }
-
-            // Periodic state save and integrator reset
-            if (iteration_count % 1000000000 == 0) {
-                printf("Saving state and reseting integrator...\n");
-                iteration_count = 0;
-                // Save current state
-                double saved_state[n];
-                for (size_t i = 0; i < n; i++){
-                    saved_state[i] = x[i];
-                }
-                // Reset the integrator
-                gsl_odeiv2_evolve_reset(e);
-
-                // Reapply saved state
-                for (size_t i = 0; i < n; i++) {
-                    x[i] = saved_state[i];
-                }
-                
-                t = 0.0;
-            }
-
-            time(&tnow);
-            if (difftime(tnow, tprev) > 2) {
+            /*
+            double tnow = omp_get_wtime();
+            if (tnow - tprev > 2.0) {
                 #pragma omp critical
                 {
-                    printf("Thread: %d, ", thread_id);
-                    printf("reinject count: %d, ", local_rcount);
-                    printf("%% completed: %3.2f %%\n", (double)local_rcount * 100.0 / (double)rtarget_per_thread);
+                    printf("Thread: [%d] - ", thread_id);
+                    printf(" progress: [%4.2f%%]\n", t * 100 / t_stationary);
                 }
                 tprev = tnow;
+            }
+            */
+            double tnow = omp_get_wtime();
+            if (tnow - tprev > 2.0 && thread_id == 0) { // Only the master thread prints progress
+                double progress = t * 100 / t_stationary;
+                printf("Progress: [%4.2f%%]\n", progress);
+                fflush(stdout); // Ensure the output is flushed immediately
+                tprev = tnow;
+            }
+
+            // Set max and min values.
+            for (size_t i = 0; i < n; i++) {
+                if (x[i] < common_min_values[i][thread_id]) {
+                    common_min_values[i][thread_id] = x[i];
+                }
+                else if (x[i] > common_max_values[i][thread_id]) {
+                    common_max_values[i][thread_id] = x[i];
+                }
             }
 
             if (status != GSL_SUCCESS) {
@@ -251,21 +188,27 @@ int main(int argc, char *argv[]) {
     }
 
     // ===============================================================================
+    // Determin overall max and min.
+    // ===============================================================================
+    for (size_t i = 0; i < num_threads; i++) {
+        for (size_t j = 0; j < n; j++) {
+            if (common_min_values[j][i] < min_minimorum[j]) {
+                min_minimorum[j] = common_min_values[j][i];
+            }
+            if (common_max_values[j][i] > max_maximorum[j]) {
+                max_maximorum[j] = common_max_values[j][i];
+            }
+        }
+    }
+
+    // ===============================================================================
     // Write results to file.
     // ===============================================================================
-    for (unsigned int i = 0; i < total_rtarget; i++) {
-        if (fabs((yreinj[i][0]) - 0.0) > 1e-7 && fabs((yreinj[i][1]) - 0.0) > 1e-7){
-            fprintf(f, "%12.5E %12.5E %12.5E %12.5E %12.5E\n",
-            yreinj[i][0],
-            yreinj[i][1],
-            yreinj[i][0] - yf,
-            yreinj[i][1] - yf,
-            yreinj[i][2]
+    for (size_t i = 0; i < n; i++) {
+        fprintf(f, "%12.5E %12.5E\n",
+            min_minimorum[i],
+            max_maximorum[i]
         );
-        }
-        else {
-            printf("%12.5E %12.5E\n", yreinj[i][0] - yf, yreinj[i][1] - yf);
-        }
     }
 
     // ===============================================================================
@@ -278,4 +221,4 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     printf("Process finished. Results stored in %s\n", write_filename);
     return 0;
-}
+}   

@@ -80,12 +80,18 @@ int main(int argc, char *argv[]) {
     stats_histogram_double(rpd2, bins2, xreinj2, rows, nbins);
     stats_histogram_double(rpdabs, binsabs, xreinjabs, rows, nbins);
 
+    // Normalize RPDs.
+    double b1 = 0.0, b2 = 0.0, babs = 0.0;
+    b1 = normalize_histogram_double(bins1, rpd1, nbins, 1.0);
+    b2 = normalize_histogram_double(bins2, rpd2, nbins, 1.0);
+    babs = normalize_histogram_double(binsabs, rpdabs, nbins, 1.0);
+
     for (unsigned int i = 0; i < nbins; i++) {
         if (rpd1[i] < rows && rpd2[i] < rows && rpdabs[i] < rows) {
-            fprintf(f, "%5.5f %5.5f %5.5f %5.5f %5.5f %5.5f\n",
-                bins1[i], rpd1[i],
-                bins2[i], rpd2[i],
-                binsabs[i], rpdabs[i]
+            fprintf(f, "%12.5E %12.5E %12.5E %12.5E %12.5E %12.5E\n",
+                bins1[i], b1 * rpd1[i],
+                bins2[i], b2 * rpd2[i],
+                binsabs[i], babs * rpdabs[i]
             );
         }
     }

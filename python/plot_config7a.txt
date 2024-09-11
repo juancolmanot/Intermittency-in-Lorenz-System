@@ -4,7 +4,7 @@ figsize: 6, 4
 axes1:
 	plots: 2
 	data:
-		file: ../datafiles/errors_lorenz_1_rpd_all.dat
+		file: ../datafiles/errors_lorenz_1_m_all.dat
 		method: scatter
 		x_col: 0
 		y_col: 1
@@ -13,7 +13,7 @@ axes1:
 		dot_size: 0.1
 		marker: ,
 	data:
-		file: ../datafiles/errors_lorenz_1_rpd_all.dat
+		file: ../datafiles/errors_lorenz_1_m_all.dat
 		method: scatter
 		x_col: 0
 		y_col: 2
@@ -21,9 +21,7 @@ axes1:
 		color: red
 		dot_size: 0.2
 		marker: ^
-	title: $\Phi(x)-x$
+	title: $M(x)-x$
 	xlabel: $x$
-	ylabel: $\Phi(x)$
-	yscale: log
-	ylim: (0, 2)
-save_file: errors_lorenz_1_rpd_all.pdf
+	ylabel: $M(x)$
+save_file: errors_lorenz_1_m_all.pdf

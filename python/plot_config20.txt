@@ -1,0 +1,60 @@
+total_axes: 4
+layout: 2, 2
+figsize: 6, 6
+axes1:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_map_y_1.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		label: y(n+1)
+		color: black
+		dot_size: 0.01
+		marker: ,
+	title: $y-map- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $y(n)$
+	ylabel: $y(n+1)$
+axes2:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_map_y_2.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		label: y(n+2)
+		color: black
+		dot_size: 0.01
+		marker: ,
+	title: $y-map- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $y(n)$
+	ylabel: $y(n+2)$
+axes3:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_map_y_3.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		label: y(n+3)
+		color: black
+		dot_size: 0.01
+		marker: ,
+	title: $y-map- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $y(n)$
+	ylabel: $y(n+3)$
+axes4:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_map_y_4.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		label: y(n+4)
+		color: black
+		dot_size: 0.01
+		marker: ,
+	title: $y-map- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $y(n)$
+	ylabel: $y(n+4)$
+save_file: lorenz_map_y_1234.pdf

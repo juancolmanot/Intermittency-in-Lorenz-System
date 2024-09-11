@@ -1,0 +1,24 @@
+total_axes: 1
+layout: 1, 1
+figsize: 8, 6
+elevation: 40
+azimuth: 45
+axes1:
+    plots: 1
+    data:
+        file: ../datafiles/reinjection_lorenz_omp_gsl_region4_1_z.dat
+        method: scatter
+        x_col: 0
+        y_col: 1
+        z_col: 2
+        label: 
+        color: black
+        dot_size: 0.0001
+        marker: ,
+    title: y map 3d
+    xlabel: x(i-1)
+    ylabel: x(i)
+    zlabel: z
+    xlim: (24.5, 27.0)
+    zlim: (150, 154)
+save_file: reinjection_lorenz_omp_gsl_region4_1_z_3d.pdf

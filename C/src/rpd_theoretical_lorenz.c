@@ -15,21 +15,19 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     // Check for right passed arguments.
     // ===============================================================================
-    if (argc != 6){
-        printf("Wrong amount of arguments, you passed %d, but 6 are required\n.", argc);
-        printf("Usage: ./run-script.sh script_to_run m_write_file");
-        printf(" m_theoric_write_file reinject_data.dat");
-        printf(" params_file.ini\n");
+    if (argc != 5){
+        printf("Wrong amount of arguments, you passed %d, but 5 are required\n.", argc);
+        printf("Usage: ./run-script.sh script_to_run rpd_write_file");
+        printf(" reinject_data.dat params_file.ini\n");
         exit(EXIT_FAILURE);
     }
 
     // ===============================================================================
     // Load arguments into variables.
     // ===============================================================================
-    const char *m_write_file = argv[2];
-    const char *m_theoric_write_file = argv[3];
-    const char *reinject_data = argv[4];
-    const char *params_file = argv[5];
+    const char *rpd_write_file = argv[2];
+    const char *reinject_data = argv[3];
+    const char *params_file = argv[4];
 
     // ===============================================================================
     // Parameters.
@@ -49,35 +47,31 @@ int main(int argc, char *argv[]) {
     //  - The structure of it is: A[2 * nregions][ni] (ni could be either the number of
     //  points for the M function or the number of bins for the RPD).
     // ===============================================================================
-    long double **M, *bm, *am, **xdomain;
-    M = (long double **)calloc((size_t)(3 * params.n_regions), sizeof(long double));
-    bm = (long double*)calloc((size_t)(params.n_regions), sizeof(long double));
-    am = (long double*)calloc((size_t)(params.n_regions), sizeof(long double));
+    long double *alphas, *x_fp, **xdomain;
+    alphas = calloc((size_t)params.n_regions, sizeof(long double));
+    x_fp = calloc((size_t)params.n_regions, sizeof(long double));
     xdomain = (long double **)calloc((size_t)(params.n_regions), sizeof(long double));
     for (int i = 0; i < params.n_regions; i++) {
         xdomain[i] = (long double *)calloc(2, sizeof(long double));
     }
 
     // ===============================================================================
-    // Array to store counts of points per region and bins per región.
+    // Load reinjected points.
     // ===============================================================================
-    unsigned int counts_region[params.n_regions][2];
+    long double *xreinj = calloc(rows, sizeof(long double));
+    for (unsigned int j = 0; j < rows; j++) {
+        xreinj[j] = data[j][3];
+    }
+
+    // ===============================================================================
+    // Sort reinjected points.
+    // ===============================================================================
+    quicksort_long_unsigned(xreinj, rows);
 
     // ===============================================================================
     // Loop through regions of M function.
     // ===============================================================================
     for (int i = 0; i < params.n_regions; i++) {
-        // ===============================================================================
-        // Load reinjected points.
-        // ===============================================================================
-        long double *xreinj = calloc(rows, sizeof(long double));
-        for (unsigned int j = 0; j < rows; j++) {
-            xreinj[j] = data[j][3];
-        }
-        // ===============================================================================
-        // Sort reinjected points.
-        // ===============================================================================
-        quicksort_long_unsigned(xreinj, rows);
         
         // ===============================================================================
         // Compute M function and get slope
@@ -96,86 +90,136 @@ int main(int argc, char *argv[]) {
                 npoints_domain++;
             }
         }
-        
-        long double Mx[npoints_fit], x_dom[npoints_domain], M_dom[npoints_domain];
+        long double x_dom[npoints_domain];
         long double Mi = 0.0;
-        counts_region[i][0] = npoints_domain;
-        counts_region[i][1] = npoints_fit;
         long double *xfit, *Mfit;
         xfit = calloc(npoints_fit, sizeof(long double));
-        Mfit = calloc(npoints_fit,   sizeof(long double));
+        Mfit = calloc(npoints_fit, sizeof(long double));
         long double mi = 0.0, bi = 0.0;
         unsigned int k = 0, l = 0;
-        
         for (unsigned int j = 0; j < rows; j++) {
             Mi += xreinj[j];
             if (xreinj[j] >= xstart_fit && xreinj[j] < xend_fit) {
                 xfit[k] = xreinj[j];
-                Mx[k] = Mi / (long double)(j + 1);
-                Mfit[k] = Mx[k];
+                Mfit[k] = Mi / (long double)(j + 1);
                 k++;
             }
             if (xreinj[j] >= xdomain[i][0] && xreinj[j] < xdomain[i][1]) {         
                 x_dom[l] = xreinj[j];
-                M_dom[l] = Mi / (long double)(j + 1);
                 l++;
             }
         }
-        
+
         linear_regression(xfit, Mfit, npoints_fit, &mi, &bi);
         
-        bm[i] = bi;
-        am[i] = mi;
-
         // ===============================================================================
-        // Allocate corresponding pointers for storing results.
+        // Compute theoretical RPD.
         // ===============================================================================
-        for (int j = i * 3; j < (i + 1) * 3; j++) {
-            M[j] = (long double *)malloc(npoints_domain * sizeof(long double));
+        long double alpha = (2 * mi - 1) / (1 - mi);
+        long double xci = 0.0;
+        if (alpha < -1.0) {
+            xci = xdomain[i][1];
+        }
+        else if (alpha >= -1.0) {
+            xci = xdomain[i][0];
         }
 
-        // ===============================================================================
-        // Write into given arrays
-        // ===============================================================================
-        for (unsigned int k = 0; k < npoints_fit; k++) {
-            M[(size_t)(i * 3)][k] = xfit[k];
-            M[(size_t)(i * 3 + 1)][k] = Mfit[k];
-            M[(size_t)(i * 3 + 2)][k] = bi + mi * xfit[k];
-        }
+        alphas[i] = alpha;
+        x_fp[i] = xci;
+        printf("%d %Lf %Lf\n", i, xci, alpha);
+        
         // ===============================================================================
         // Free memory.
         // ===============================================================================
-        free(xreinj);
         free(xfit);
         free(Mfit);
     }
+ 
+    // ===============================================================================
+    // Compute Numerical RPD.
+    // ===============================================================================
+    unsigned int nbins_tot = 0;
+    for (int j = 0; j < params.n_regions; j++){
+        nbins_tot += params.region_bins[j];
+    }
+    long double *bins_tot, *rpd_tot;
+    bins_tot = calloc(nbins_tot, sizeof(long double));
+    rpd_tot = calloc(nbins_tot, sizeof(long double));
+    long double xmin_tot, xmax_tot, dx_tot;
+    xmin_tot = la_min(xreinj, rows);
+    xmax_tot = la_max(xreinj, rows);
+    dx_tot = (xmax_tot - xmin_tot) / (long double)(nbins_tot - 1);
+    for (unsigned int j = 1; j < nbins_tot; j++) {
+        bins_tot[j - 1] = xmin_tot + dx_tot * (long double)j;
+    }
+    stats_histogram(rpd_tot, bins_tot, xreinj, rows, nbins_tot);
+
+    // ===============================================================================
+    // Normalize Numerical RPD.
+    // ===============================================================================
+    unsigned int mtecarlopoints = 100000;
+    long double integral_rpd_tot = montecarlo_integration_long(
+        bins_tot,
+        rpd_tot,
+        nbins_tot,
+        mtecarlopoints
+    );
+    long double const_norm_tot = 1.0 / integral_rpd_tot;
+    for (unsigned int j = 0; j < nbins_tot; j++) {
+        rpd_tot[j] *= const_norm_tot;
+    }
+
+    // ===============================================================================
+    // Compute Theoretical RPD.
+    // ===============================================================================
+    unsigned int nbins = nbins_tot;
+    long double *bins_theoric, *rpd_theoric;
+    bins_theoric = calloc(nbins, sizeof(long double));
+    rpd_theoric = calloc(nbins, sizeof(long double));
+    long double xmin, xmax, dx;
+    xmin = la_min(xreinj, rows);
+    xmax = la_max(xreinj, rows);
+    dx = (xmax - xmin) / (long double)(nbins - 1);
+    for (unsigned int j = 1; j < nbins; j++) {
+        bins_theoric[j - 1] = xmin + dx * (long double)j;
+    }
+
+    for (unsigned int i = 0; i < nbins; i++) {
+        
+        for (int j = 0; j < params.n_regions; j++){
+            rpd_theoric[i] += powl(fabsl(bins_theoric[i] - x_fp[j]), alphas[j]);
+        }
+        
+        //rpd_theoric[i] = powl(fabsl(bins_theoric[i] - x_fp[4]), alphas[4]);
+    }
+
+    // ===============================================================================
+    // Normalize theoretical RPD.
+    // ===============================================================================
+    /*
+    long double integral_rpd_theoric = montecarlo_integration_long(
+        bins_theoric,
+        rpd_theoric,
+        nbins_tot,
+        mtecarlopoints
+    );
+    long double const_norm_theoric = 1.0L / integral_rpd_theoric;
+    for (unsigned int j = 0; j < nbins_tot; j++) {
+        rpd_theoric[j] *= const_norm_theoric;
+    }
+    */
+
     // ===============================================================================
     // Write into given files
     // ===============================================================================
-    FILE *m_file, *m_theoric_file;
-    m_file = open_file(m_write_file);
-    m_theoric_file = open_file(m_theoric_write_file);
-    fprintf(m_theoric_file, "%12s %12s %12s %12s %12s\n", 
-        "zone",
-        "b",
-        "m",
-        "x_start",
-        "x_end"
-    );
-    for (int i = 0; i < params.n_regions; i++) {
-        for (unsigned int j = 0; j < counts_region[i][1]; j++) {
-            fprintf(m_file, "%5.10Lf %5.10Lf %5.10Lf\n",
-                M[i * 3][j],
-                M[(i * 3) + 1][j],
-                M[(i * 3) + 2][j]
-            );  
-        }
-        fprintf(m_theoric_file, "%12d %12.3LE %12.3LE %12.3LE %12.3LE\n",
-            i,
-            bm[i],
-            am[i],
-            xdomain[i][0],
-            xdomain[i][1]
+    FILE *rpd_file = open_file(rpd_write_file);
+        
+    for (unsigned int i = 0; i < nbins_tot; i++){
+        fprintf(rpd_file, "%12.3LE %12.3LE %12.3LE %12.3LE\n",
+            bins_tot[i],
+            bins_theoric[i],
+            rpd_tot[i],
+            rpd_theoric[i]
         );
     }
 
@@ -185,26 +229,30 @@ int main(int argc, char *argv[]) {
     for (unsigned int i = 0; i < rows; i++) {
         free(data[i]);
     }
-    for (int i = 0; i < (3 * params.n_regions); i++) {
-        free(M[i]);
-    }
-    for (int i = 0; i < params.n_regions; i++){
+    for (unsigned int i = 0; i < params.n_regions; i++){
         free(xdomain[i]);
     }
-    free(bm);
-    free(am);
-    free(data);
-    free(M);
     free(xdomain);
+    free(bins_tot);
+    free(bins_theoric);
+    free(rpd_tot);
+    free(rpd_theoric);
+    free(xreinj);
+    free(x_fp);
+    free(alphas);
+    free(data);
     free(params.xmins_fit);
     free(params.xmaxs_fit);
     free(params.xmins_domain);
     free(params.xmaxs_domain);
     free(params.region_bins);
     free(params.xc);
+
+    fclose(rpd_file);
+
     // ===============================================================================
     // Finish statement.
     // ===============================================================================
-    printf("Process finished. Results stored in %s and %s.\n", m_write_file, m_theoric_write_file);
+    printf("Process finished. Results stored in %s.\n", rpd_write_file);
     return 0;
 }

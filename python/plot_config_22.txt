@@ -1,0 +1,70 @@
+total_axes: 2
+layout: 2, 1
+figsize: 6, 8
+axes1:
+	plots: 4
+	data:
+		file: ../datafiles/m_function_num_lorenz.dat
+		method: scatter
+		x_col: 2
+		y_col: 3
+		color: black
+		dot_size: 0.5
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_m_0.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_m_1.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_m_2.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+	title: $M(x)$ Theoretical vs Numeric
+	xlabel: $x$
+	ylabel: $M(x)$
+axes2:
+	plots: 4
+	data:
+		file: ../datafiles/rpd_numerical_lorenz_all.dat
+		method: scatter
+		x_col: 2
+		y_col: 3
+		color: black
+		dot_size: 0.5
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_rpd_0.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_rpd_1.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_rpd_2.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+	title: $\Phi(x)$ Theoretical vs Numeric
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+save_file: m_rpd_errors_num_theo_1_3reg_all_4.pdf

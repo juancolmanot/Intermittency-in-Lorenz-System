@@ -1,0 +1,70 @@
+total_axes: 3
+layout: 3, 1
+figsize: 6, 12 
+axes1:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_rpd_0.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_rpd_0.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $\Phi1(x)$
+	xlabel: $x$
+	ylabel: $\Phi1(x)$
+axes2:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_rpd_1.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_rpd_1.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $\Phi2(x)$
+	xlabel: $x$
+	ylabel: $\Phi2(x)$
+axes3:
+	plots: 2
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_rpd_2.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/errors_lorenz_1_3reg_rpd_2.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		color: red
+		linewidth: 1
+		label: theoric
+	title: $\Phi3(x)$
+	xlabel: $x$
+	ylabel: $\Phi3(x)$
+save_file: rpd_num_theo_lorenz_3reg_all.pdf

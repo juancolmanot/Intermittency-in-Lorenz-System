@@ -37,8 +37,8 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     // We load parameters in params1 variable
     // ===============================================================================
-    Parameters6 params;
-    load_parameters_from_file(params_file, &params, handler6);
+    Parameters5 params;
+    load_parameters_from_file(params_file, &params, handler5);
 
     // ===============================================================================
     // File to write to
@@ -52,6 +52,10 @@ int main(int argc, char *argv[]) {
     double atol, rtol;
     atol = params.atol;
     rtol = params.rtol;
+    double t, t_transient, t_stationary;
+    t = 0.0;
+    t_transient = params.t_transient;
+    t_stationary = t_transient + params.t_stationary;
 
     // ===============================================================================
     // Initial state.
@@ -76,12 +80,9 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     double yf = 41.2861;
     double clam = 1.85;
-    unsigned int rtarget_per_thread = params.rtarget;
+    unsigned int rtarget_per_thread = 20000;
     unsigned int total_rtarget = rtarget_per_thread * num_threads;
-    double yreinj[total_rtarget][3];
-    double ymin, ymax;
-    ymin = params.xmin;
-    ymax = params.xmax;
+    double yreinj[total_rtarget][2];
 
     // ===============================================================================
     // Integrate stationary state.
@@ -113,14 +114,6 @@ int main(int argc, char *argv[]) {
         }
 
         // ===============================================================================
-        // Integration parameters.
-        // ===============================================================================
-        double t, t_transient, t_stationary;
-        t = 0.0;
-        t_transient = params.t_transient;
-        t_stationary = t_transient + params.t_stationary;
-
-        // ===============================================================================
         // Preparing integrator.
         // ===============================================================================
         const gsl_odeiv2_step_type *integrator = gsl_odeiv2_step_rkf45;
@@ -143,9 +136,9 @@ int main(int argc, char *argv[]) {
         // ===============================================================================
         // Arrays for interpolation and map.
         // ===============================================================================
-        long double xfit[n], yfit[n], zfit[n];
-        double yreg[3], zreg;
-        yreg[0] = yreg[1] = zreg = 0.0;
+        long double xfit[n], yfit[n];
+        double yreg[2];
+        yreg[0] = yreg[1] = 0.0;
         double xp = 0;
         long double ci[n];
 
@@ -156,21 +149,17 @@ int main(int argc, char *argv[]) {
             int status = gsl_odeiv2_evolve_apply(e, c, s, &sys, &t, t_stationary, &h, x);
             xfit[i] = x[0];
             yfit[i] = x[1];
-            zfit[i] = x[2];
             if (status != GSL_SUCCESS) {
                 printf("error initializing, return value=%d\n", status);
                 break;
             }
         }
 
-        time_t start_time = time(NULL);
         time_t tprev, tnow;
         time(&tprev);
         unsigned int local_rcount = 0;
-        unsigned long int iteration_count = 0;
 
         while (local_rcount < rtarget_per_thread) {
-            iteration_count++;
             int status = gsl_odeiv2_evolve_apply(e, c, s, &sys, &t, t_stationary, &h, x);
             
             xfit[0] = xfit[1];
@@ -181,63 +170,29 @@ int main(int argc, char *argv[]) {
             yfit[1] = yfit[2];
             yfit[2] = x[1];
 
-            zfit[0] = zfit[1];
-            zfit[1] = zfit[2];
-            zfit[2] = x[2];
-
             if (xfit[0] < xp) {
                 if (xfit[1] > xp) {
                     quadratic_regression(xfit, yfit, 3, ci);
                     yreg[1] = (double)(ci[0] * xp * xp + ci[1] * xp + ci[2]);
-                    quadratic_regression(xfit, zfit, 3, ci);
-                    zreg = (double)(ci[0] * xp * xp + ci[1] * xp + ci[2]);
                     if (yreg[1] >= yf - clam && yreg[1] <= yf + clam) {
-                        if (yreg[0] < yf - clam || yreg[0] > yf + clam) {
-                            if (yreg[0] >= ymin && yreg[0] < ymax){
-                                unsigned int index = thread_id * rtarget_per_thread + local_rcount;
-                                yreinj[index][0] = yreg[0];
-                                yreinj[index][1] = yreg[1];
-                                yreinj[index][2] = zreg;
-                                local_rcount++;    
-                            }
+                        if (yreg[0] >= yf - clam && yreg[0] <= yf + clam) {
+                            unsigned int index = thread_id * rtarget_per_thread + local_rcount;
+                            yreinj[index][0] = yreg[0];
+                            yreinj[index][1] = yreg[1];
+                            local_rcount++;
                         }
                     }
                     yreg[0] = yreg[1];
                 }
             }
 
-            // Periodic state save and integrator reset
-            if (iteration_count % 1000000000 == 0) {
-                printf("Saving state and reseting integrator...\n");
-                iteration_count = 0;
-                // Save current state
-                double saved_state[n];
-                for (size_t i = 0; i < n; i++){
-                    saved_state[i] = x[i];
-                }
-                // Reset the integrator
-                gsl_odeiv2_evolve_reset(e);
-
-                // Reapply saved state
-                for (size_t i = 0; i < n; i++) {
-                    x[i] = saved_state[i];
-                }
-                
-                t = 0.0;
-            }
-
             time(&tnow);
             if (difftime(tnow, tprev) > 2) {
-                double elapsed_time = difftime(tnow, start_time);
-                unsigned int remaining_points = rtarget_per_thread - local_rcount;
-                double reinject_rate = (double)local_rcount / elapsed_time;
-                double eta = (double)remaining_points / reinject_rate;
                 #pragma omp critical
                 {
                     printf("Thread: %d, ", thread_id);
                     printf("reinject count: %d, ", local_rcount);
-                    printf("%% completed: %3.2f %%", (double)local_rcount * 100.0 / (double)rtarget_per_thread);
-                    printf(" e.t.a: %3.2f [min]\n", eta / 60.0);
+                    printf("%% completed: %3.2f %%\n", (double)local_rcount * 100.0 / (double)rtarget_per_thread);
                 }
                 tprev = tnow;
             }
@@ -261,12 +216,11 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     for (unsigned int i = 0; i < total_rtarget; i++) {
         if (fabs((yreinj[i][0]) - 0.0) > 1e-7 && fabs((yreinj[i][1]) - 0.0) > 1e-7){
-            fprintf(f, "%12.5E %12.5E %12.5E %12.5E %12.5E\n",
+            fprintf(f, "%12.5E %12.5E %12.5E %12.5E\n",
             yreinj[i][0],
             yreinj[i][1],
             yreinj[i][0] - yf,
-            yreinj[i][1] - yf,
-            yreinj[i][2]
+            yreinj[i][1] - yf
         );
         }
         else {
@@ -284,4 +238,4 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     printf("Process finished. Results stored in %s\n", write_filename);
     return 0;
-}
+}   

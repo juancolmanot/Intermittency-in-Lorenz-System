@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
             xreinj[i],
             Mi / (double)(i + 1),
             xreinj_fp[i],
-            Mi_fp / (double)(i + 1),
+            (Mi_fp / (double)(i + 1)),
             xreinj[i] - xreinj[0],
             (Mi / (double)(i + 1)) - (xreinj[0] / 1.0)
         );

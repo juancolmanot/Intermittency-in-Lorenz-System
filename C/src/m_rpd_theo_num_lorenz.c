@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     if (argc != 5){
         printf("Wrong amount of arguments, you passed %d, but 5 are required\n.", argc);
-        printf("Usage: ./run-script.sh script_to_run errors_write_file");
+        printf("Usage: ./run-script.sh script_to_run m_rpd_write_file");
         printf(" reinjection_data.dat params_file.ini\n");
         exit(EXIT_FAILURE);
     }
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     // Load arguments into variables.
     // ===============================================================================
-    const char *errors_write_file = argv[2];
+    const char *m_rpd_write_file = argv[2];
     const char *reinjection_data = argv[3];
     const char *params_file = argv[4];
 
@@ -78,10 +78,10 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     // Open files to complete M(x) and RPD(x) and erase their content.
     // ===============================================================================
-    char err_file_m_all[256], err_file_rpd_all[256];
-    sprintf(err_file_m_all, "%s_m_all.dat", errors_write_file);
-    sprintf(err_file_rpd_all, "%s_rpd_all.dat", errors_write_file);
-    FILE *fm_all = fopen(err_file_m_all, "w"), *frpd_all = fopen(err_file_rpd_all, "w");
+    char file_m_all[256], file_rpd_all[256];
+    sprintf(file_m_all, "%s_m_all.dat", m_rpd_write_file);
+    sprintf(file_rpd_all, "%s_rpd_all.dat", m_rpd_write_file);
+    FILE *fm_all = fopen(file_m_all, "w"), *frpd_all = fopen(file_rpd_all, "w");
     fclose(fm_all);
     fclose(frpd_all);
 
@@ -113,9 +113,21 @@ int main(int argc, char *argv[]) {
         long double m, b;
         linear_regression(x_region, M_region, n_region, &m, &b);
 
-        long double *M_theoretical = calloc(n_region, sizeof(long double));
-        for (unsigned int j = 0; j < n_region; j++) {
-            M_theoretical[j] = b + m * x_region[j];
+        // Now use the domain values for the theoretical function
+        long double *x_region_d = calloc(100, sizeof(long double));
+        unsigned int n_region_d = 0;
+        long double xmin_d = params.xmins_domain[i], xmax_d = params.xmaxs_domain[i];
+        get_region_array(xreinj, xmin_d, xmax_d, rows, &x_region_d, &n_region_d);
+
+        long double *M_theoretical = calloc(n_region_d, sizeof(long double));
+        long double *M_numerical = calloc(n_region_d, sizeof(long double));
+        unsigned int idxmin_d = get_value_loc(xreinj, x_region_d[0], rows);
+        unsigned int idxmax_d = get_value_loc(xreinj, x_region_d[n_region_d - 1], rows);
+        for (unsigned int j = 0; j < n_region_d; j++) {
+            M_theoretical[j] = b + m * x_region_d[j];
+        }
+        for (unsigned int j = idxmin_d; j < idxmax_d + 1; j++) {
+            M_numerical[j - idxmin_d] = M_tot[j];
         }
 
         // Compute alpha.
@@ -142,89 +154,73 @@ int main(int argc, char *argv[]) {
         long double xci = params.xc[i];
         // Normalize rpd.
         long double int_rpd = 0.0;
-        long double lbound = x_region[0], ubound = x_region[n_region - 1];
+        long double lbound = x_region_d[0], ubound = x_region_d[n_region_d - 1];
         int_rpd = rpd_theoretical_integral(alpha, xci, lbound, ubound);
         int_rpd = fabsl(int_rpd);
-        long double bnorm = (long double)(n_region)/ ((long double)(rows) * int_rpd);
+        long double bnorm = (long double)(n_region_d)/ ((long double)(rows) * int_rpd);
         // Compute rpd theoretical
         for (unsigned int j = 0; j < nbins_i; j++) {
-            bins_i[j] = x_region[0] + (x_region[n_region - 1] - x_region[0]) * (long double)j / (long double)(nbins_i - 1);
+            bins_i[j] = x_region_d[0] + (x_region_d[n_region_d - 1] - x_region_d[0]) * (long double)j / (long double)(nbins_i - 1);
             rpd_i[j] = bnorm * powl(fabsl(bins_i[j] - xci), alpha);
         }
 
-
-        // ===============================================================================
-        // Compute MSE between theoretical and numerical RPD and M.
-        // ===============================================================================
-        long double m_error = 0.0, rpd_error = 0.0;
-        // Compute error in M(x).
-        m_error = RMSE(M_region, M_theoretical, n_region);
-
         // Compute region RPD(x) numerical;
         long double *rpd_region = calloc(nbins_i, sizeof(long double));
-        long double wi = (long double)n_region / (long double)rows;
-        compute_rpd_numerical(x_region, n_region, bins_i, rpd_region, nbins_i, wi);
+        long double wi = (long double)n_region_d / (long double)rows;
+        compute_rpd_numerical(x_region_d, n_region_d, bins_i, rpd_region, nbins_i, wi);
         
-        // Compute error in RPD(x);
-        rpd_error = RMSE(rpd_region, rpd_i, nbins_i);
         printf("m: %Lf, alpha: %Lf\n", m, alpha);
-        printf("%% points in region: %Lf\n", (long double)n_region / (long double)rows);
-        printf("region: %d - merr: %12.5LE, rpderr: %12.5LE\n", i + 1, m_error, rpd_error);
+        printf("%% points in region: %Lf\n", (long double)n_region_d / (long double)rows);
         printf("===================================================================================\n");
 
         // ===============================================================================
         // Write results to files.
         // ===============================================================================
-        char err_file_m[256], err_file_rpd[256];
-        sprintf(err_file_m, "%s_m_%d.dat", errors_write_file, i);
-        sprintf(err_file_rpd, "%s_rpd_%d.dat", errors_write_file, i);
-        FILE *fm = fopen(err_file_m, "w");
-        FILE *frpd = fopen(err_file_rpd, "w");
+        char file_m[256], file_rpd[256];
+        sprintf(file_m, "%s_m_%d.dat", m_rpd_write_file, i);
+        sprintf(file_rpd, "%s_rpd_%d.dat", m_rpd_write_file, i);
+        FILE *fm = fopen(file_m, "w");
+        FILE *frpd = fopen(file_rpd, "w");
         // Open general files to append.
-        FILE *fm_all = fopen(err_file_m_all, "a");
-        FILE *frpd_all = fopen(err_file_rpd_all, "a");
-        long double local_err_m = 0.0, local_err_rpd = 0.0;
-        for (unsigned int j = 0; j < idxmax - idxmin; j++) {
-            local_err_m = fabsl(M_region[j] - M_theoretical[j]);
-            fprintf(fm, "%d %12.5LE %12.5LE %12.5LE %12.5LE\n",
+        FILE *fm_all = fopen(file_m_all, "a");
+        FILE *frpd_all = fopen(file_rpd_all, "a");
+        for (unsigned int j = 0; j < idxmax_d - idxmin_d; j++) {
+            fprintf(fm, "%d %12.5LE %12.5LE %12.5LE\n",
                 j,
-                x_region[j],
-                M_region[j],
-                M_theoretical[j],
-                local_err_m
+                x_region_d[j],
+                M_numerical[j],
+                M_theoretical[j]
             );
-            fprintf(fm_all, "%12.5LE %12.5LE %12.5LE %12.5LE\n",
-                x_region[j],
-                M_region[j],
-                M_theoretical[j],
-                local_err_m
+            fprintf(fm_all, "%12.5LE %12.5LE %12.5LE\n",
+                x_region_d[j],
+                M_numerical[j],
+                M_theoretical[j]
             );
         }
         for (unsigned int j = 1; j < nbins_i - 1; j++) {
-            local_err_rpd = fabsl(rpd_region[j] - rpd_i[j]);
-            fprintf(frpd, "%d %12.5LE %12.5LE %12.5LE %12.5LE\n",
+            fprintf(frpd, "%d %12.5LE %12.5LE %12.5LE\n",
                 j,
                 bins_i[j],
                 rpd_region[j],
-                rpd_i[j],
-                local_err_rpd
+                rpd_i[j]
             );
-            fprintf(frpd_all, "%12.5LE %12.5LE %12.5LE %12.5LE\n",
+            fprintf(frpd_all, "%12.5LE %12.5LE %12.5LE\n",
                 bins_i[j],
                 rpd_region[j],
-                rpd_i[j],
-                local_err_rpd
+                rpd_i[j]
             );
         }
-        printf("Results stored in %s & %s.\n", err_file_m, err_file_rpd);
+        printf("Results stored in %s & %s.\n", file_m, file_rpd);
         fclose(fm);
         fclose(frpd);
         fclose(fm_all);
         fclose(frpd_all);
         free(x_region);
+        free(x_region_d);
         free(M_region);
         free(rpd_region);
         free(M_theoretical);
+        free(M_numerical);
         free(rpd_i);
         free(bins_i);
     }

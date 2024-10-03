@@ -4,17 +4,17 @@ figsize: 6, 3
 axes1:
 	plots: 1
 	data:
-		file: ../datafiles/m_numerical_scaled_lorenz_region.dat
+		file: ../datafiles/rpd_numerical_lorenz_gsl_omp_c2.dat
 		method: scatter
-		x_col: 4
-		y_col: 5
+		x_col: 2
+		y_col: 3
 		label: numeric
 		color: black
 		dot_size: 0.1
 		marker: ,
-	title: $M(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	title: $RPD(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
 	xlabel: $x$
-	ylabel: $M(x)$
-	yscale: log
-	xscale: log
-save_file: m_numerical_scaled_lorenz_region.pdf
+	ylabel: $RPD(x)$
+	yscale: linear
+	xscale: linear
+save_file: rpd_numerical_lorenz_gsl_omp_c2.pdf

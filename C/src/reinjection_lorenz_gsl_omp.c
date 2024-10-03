@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     // Reinjection parameters.
     // ===============================================================================
     double yf = 41.2861;
-    double clam = 0.1;
+    double clam = 2.0;
     unsigned int rtarget_per_thread = 10000;
     unsigned int total_rtarget = rtarget_per_thread * num_threads;
     double yreinj[total_rtarget][2];

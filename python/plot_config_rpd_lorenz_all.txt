@@ -1,0 +1,54 @@
+total_axes: 2
+layout: 2, 1
+figsize: 6, 6
+axes1:
+	plots: 2
+	data:
+		file: ../datafiles/lorenz_3reg_rpd_all.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/lorenz_3reg_rpd_all.dat
+		method: scatter
+		x_col: 0
+		y_col: 2
+		color: red
+		marker: o
+		dot_size: 0.5
+		label: theoric
+	title: $\Phi1(x)$
+	xlabel: $x$
+	ylabel: $\Phi1(x)$
+	xscale: linear
+	yscale: linear
+axes2:
+	plots: 2
+	data:
+		file: ../datafiles/lorenz_3reg_m_all.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		color: black
+		dot_size: 0.5
+		marker: ^
+		label: num
+	data:
+		file: ../datafiles/lorenz_3reg_m_all.dat
+		method: scatter
+		x_col: 0
+		y_col: 2
+		color: red
+		marker: o
+		dot_size: 0.5
+		label: theoric
+	title: $M(x)$
+	xlabel: $x$
+	ylabel: $M(x)$
+	xscale: linear
+	yscale: linear
+save_file: rpd_m_num_theo_lorenz_3reg_all_complete.pdf

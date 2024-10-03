@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     // Compute numerical RPD
     // ===============================================================================
-    unsigned int nbins = 300;
+    unsigned int nbins = 800;
     double bins1[nbins], rpd1[nbins], bins2[nbins], rpd2[nbins], binsabs[nbins], rpdabs[nbins];
     double xmin1, xmax1, dx1;
     double xmin2, xmax2, dx2;

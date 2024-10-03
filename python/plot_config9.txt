@@ -1,51 +1,256 @@
-total_axes: 2
-layout: 2, 1
-figsize: 6, 6
+total_axes: 18
+layout: 9, 2
+figsize: 12, 27
 axes1:
-	plots: 2
+	plots: 1
 	data:
-		file: ../datafiles/m_tn_lorenz_5_zones.dat
+		file: ../datafiles/lorenz_by_zone_m_0_prev_region.dat
 		method: scatter
 		x_col: 0
 		y_col: 1
-		label: numeric
+		label:
 		color: black
 		dot_size: 1
 		linewidth: 0.5
-	data:
-		file: ../datafiles/m_tn_lorenz_5_zones.dat
-		method: plot
-		x_col: 0
-		y_col: 2
-		label: theoric
-		color: red
-		dot_size: 1
-		linewidth: 0.5
-	title: $M(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	title: $M(x) \,- Region\, 1$
 	xlabel: $x$
 	ylabel: $M(x)$
 axes2:
-	plots: 2
+	plots: 1
 	data:
-		file: ../datafiles/rpd_tn_lorenz_5_zones.dat
+		file: ../datafiles/lorenz_by_zone_rpd_0_prev_region.dat
 		method: scatter
 		x_col: 0
 		y_col: 1
-		label: numeric
+		label:
 		color: black
 		dot_size: 1
 		linewidth: 0.5
-	data:
-		file: ../datafiles/rpd_tn_lorenz_5_zones.dat
-		method: plot
-		x_col: 0
-		y_col: 2
-		label: theoric
-		color: red
-		dot_size: 1
-		linewidth: 0.5
-	title: $\Phi(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	title: $\Phi(x) \,- Region\, 1$
 	xlabel: $x$
 	ylabel: $\Phi(x)$
-	ylim: [0, 5]
-save_file: rpd_m_tn_lorenz_5_zones.pdf
+axes3:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_m_1_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $M(x) \,- Region\, 2$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes4:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_rpd_1_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $\Phi(x) \,- Region\, 2$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+axes5:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_m_2_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $M(x) \,- Region\, 3$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes6:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_rpd_2_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $\Phi(x) \,- Region\, 3$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+axes7:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_m_3_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $M(x) \,- Region\, 4$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes8:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_rpd_3_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $\Phi(x) \,- Region\, 4$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+axes9:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_m_4_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $M(x) \,- Region\, 5$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes10:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_rpd_4_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $\Phi(x) \,- Region\, 5$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+axes11:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_m_5_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $M(x) \,- Region\, 6$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes12:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_rpd_5_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $\Phi(x) \,- Region\, 6$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+axes13:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_m_6_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $M(x) \,- Region\, 7$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes14:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_rpd_6_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $\Phi(x) \,- Region\, 7$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+axes15:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_m_7_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $M(x) \,- Region\, 8$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes16:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_rpd_7_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $\Phi(x) \,- Region\, 8$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+axes17:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_m_8_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $M(x) \,- Region\, 8$
+	xlabel: $x$
+	ylabel: $M(x)$
+axes18:
+	plots: 1
+	data:
+		file: ../datafiles/lorenz_by_zone_rpd_8_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		label:
+		color: black
+		dot_size: 1
+		linewidth: 0.5
+	title: $\Phi(x) \,- Region\, 8$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+save_file: m_rpd_by_prev_zones_all.pdf

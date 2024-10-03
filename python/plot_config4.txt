@@ -1,32 +1,19 @@
-total_axes: 2
-layout: 2, 1
-figsize: 6, 6
+total_axes: 1
+layout: 1, 1
+figsize: 6, 3
 axes1:
 	plots: 1
 	data:
-		file: ../datafiles/m_numerical_lorenz_region4_1_3.dat
+		file: ../datafiles/reinjection_lorenz_gsl_omp.dat
 		method: scatter
-		x_col: 2
+		x_col: 0
 		y_col: 3
-		label: numeric
+		label:
 		color: black
 		dot_size: 0.5
 		linewidth: 0.5
-	title: $M(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
-	xlabel: $x$
-	ylabel: $M(x)$
-axes2:
-	plots: 1
-	data:
-		file: ../datafiles/rpd_numerical_lorenz_region4_1_3.dat
-		method: scatter
-		x_col: 2
-		y_col: 3
-		label: numeric
-		color: black
-		dot_size: 1
-		linewidth: 0.5
-	title: $\Phi(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
-	xlabel: $x$
-	ylabel: $\Phi(x)$
-save_file: m_rpd_numerical_lorenz_region4_1_3.pdf
+	title: $y(n-1)\,vs\,y(n)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
+	xlabel: $y(n-1)$
+	ylabel: $y(n)$
+	yscale: linear
+save_file: yn_yn1_lorenz.pdf

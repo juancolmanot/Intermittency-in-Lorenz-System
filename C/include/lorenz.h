@@ -4,7 +4,7 @@
 typedef struct {
     double sigma;
     double rho;
-    double beta;
+    double   beta;
 } lorenz_par;
 
 void lorenz(

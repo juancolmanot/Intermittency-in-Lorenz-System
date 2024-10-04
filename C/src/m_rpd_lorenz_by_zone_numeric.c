@@ -93,6 +93,7 @@ int main(int argc, char *argv[]) {
         long double *x_region = calloc(100, sizeof(long double));
         unsigned int n_region = 0;
         long double xmin = params.xmins_fit[i], xmax = params.xmaxs_fit[i];
+        
         get_region_array(xreinj, xmin, xmax, rows, &x_region, &n_region);
 
         // ===============================================================================

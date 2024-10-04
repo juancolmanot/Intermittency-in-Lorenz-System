@@ -1,0 +1,37 @@
+total_axes: 1
+layout: 1, 1
+figsize: 6, 4
+axes1:
+	plots: 4
+	data:
+		file: ../datafiles/lorenz_by_zone_rpd_1_prev_region.dat
+		method: scatter
+		x_col: 0
+		y_col: 1
+		color: black
+		dot_size: 0.1
+	data:
+		file: ../datafiles/lorenz_theoretical_from_file_1__rpd_0.dat
+		method: plot
+		x_col: 0
+		y_col: 1
+		color: red
+		linewidth: 0.5
+	data:
+		file: ../datafiles/lorenz_theoretical_from_file_1__rpd_1.dat
+		method: plot
+		x_col: 0
+		y_col: 1
+		color: red
+		linewidth: 0.5
+	data:
+		file: ../datafiles/lorenz_theoretical_from_file_1__rpd_2.dat
+		method: plot
+		x_col: 0
+		y_col: 1
+		color: red
+		linewidth: 0.5
+	title: $\Phi(x)\,x$
+	xlabel: $x$
+	ylabel: $\Phi(x)$
+save_file: rpd_num_theo_from_files_region2.pdf

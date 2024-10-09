@@ -1,0 +1,40 @@
+total_axes: 2
+layout: 2, 1
+figsize: 6, 6
+axes1:
+	plots: 1
+	data:
+		file: ../datafiles/bifurcation_lorenz_gsl.dat
+		method: scatter
+		x_col: 0
+		y_col: 2
+		label:
+		color: black
+		dot_size: 0.1
+		marker: .
+	title: $Bifurcation\,diagram$
+	xlabel: $\rho$
+	ylabel: $y$
+axes2:
+	plots: 2
+	data:
+		file: ../datafiles/bifurcation_lorenz_gsl.dat
+		method: scatter
+		x_col: 1
+		y_col: 2
+		label:
+		color: black
+		dot_size: 0.1
+		marker: .
+	data:
+		file: ../datafiles/bifurcation_lorenz_gsl.dat
+		method: plot
+		x_col: 1
+		y_col: 1
+		label:
+		color: red
+		linewidth: 1
+	title: $yn\,yn+1\,diagram$
+	xlabel: $y(n)$
+	ylabel: $y(n+1)$
+save_file: bifurcation_diagram_rho_y.pdf

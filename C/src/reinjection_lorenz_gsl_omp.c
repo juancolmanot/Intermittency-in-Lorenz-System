@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     // Reinjection parameters.
     // ===============================================================================
     double yf = 41.2861;
-    double clam = 2.0;
+    double ubound = 1.85, lbound = 1.85;
     unsigned int rtarget_per_thread = 10000;
     unsigned int total_rtarget = rtarget_per_thread * num_threads;
     double yreinj[total_rtarget][2];
@@ -155,11 +155,13 @@ int main(int argc, char *argv[]) {
             }
         }
 
+        time_t start_time = time(NULL);
         time_t tprev, tnow;
         time(&tprev);
         unsigned int local_rcount = 0;
-
+        unsigned long int iteration_count = 0;
         while (local_rcount < rtarget_per_thread) {
+            iteration_count++;
             int status = gsl_odeiv2_evolve_apply(e, c, s, &sys, &t, t_stationary, &h, x);
             
             xfit[0] = xfit[1];
@@ -174,8 +176,8 @@ int main(int argc, char *argv[]) {
                 if (xfit[1] > xp) {
                     quadratic_regression(xfit, yfit, 3, ci);
                     yreg[1] = (double)(ci[0] * xp * xp + ci[1] * xp + ci[2]);
-                    if (yreg[1] >= yf - clam && yreg[1] <= yf + clam) {
-                        if (yreg[0] < yf - clam || yreg[0] > yf + clam) {
+                    if (yreg[1] >= yf - lbound && yreg[1] <= yf + ubound) {
+                        if (yreg[0] < yf - lbound || yreg[0] > yf + ubound) {
                             unsigned int index = thread_id * rtarget_per_thread + local_rcount;
                             yreinj[index][0] = yreg[0];
                             yreinj[index][1] = yreg[1];
@@ -186,13 +188,38 @@ int main(int argc, char *argv[]) {
                 }
             }
 
+            // Periodic state save and integrator reset
+            if (iteration_count % 1000000000 == 0) {
+                printf("Saving state and reseting integrator...\n");
+                iteration_count = 0;
+                // Save current state
+                double saved_state[n];
+                for (size_t i = 0; i < n; i++){
+                    saved_state[i] = x[i];
+                }
+                // Reset the integrator
+                gsl_odeiv2_evolve_reset(e);
+
+                // Reapply saved state
+                for (size_t i = 0; i < n; i++) {
+                    x[i] = saved_state[i];
+                }
+                
+                t = 0.0;
+            }
+
             time(&tnow);
             if (difftime(tnow, tprev) > 2) {
+                double elapsed_time = difftime(tnow, start_time);
+                unsigned int remaining_points = rtarget_per_thread - local_rcount;
+                double reinject_rate = (double)local_rcount / elapsed_time;
+                double eta = (double)remaining_points / reinject_rate;
                 #pragma omp critical
                 {
                     printf("Thread: %d, ", thread_id);
                     printf("reinject count: %d, ", local_rcount);
-                    printf("%% completed: %3.2f %%\n", (double)local_rcount * 100.0 / (double)rtarget_per_thread);
+                    printf("%% completed: %3.2f %%", (double)local_rcount * 100.0 / (double)rtarget_per_thread);
+                    printf(" e.t.a: %3.2f [min]\n", eta / 60.0);
                 }
                 tprev = tnow;
             }

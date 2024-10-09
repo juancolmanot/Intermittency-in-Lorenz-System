@@ -29,6 +29,7 @@ axes2:
 	title: $\Phi(x) \,- Region\, 1$
 	xlabel: $x$
 	ylabel: $\Phi(x)$
+	yscale: log
 axes3:
 	plots: 1
 	data:
@@ -57,6 +58,7 @@ axes4:
 	title: $\Phi(x) \,- Region\, 2$
 	xlabel: $x$
 	ylabel: $\Phi(x)$
+	yscale: log
 axes5:
 	plots: 1
 	data:
@@ -85,6 +87,7 @@ axes6:
 	title: $\Phi(x) \,- Region\, 3$
 	xlabel: $x$
 	ylabel: $\Phi(x)$
+	yscale: log
 axes7:
 	plots: 1
 	data:
@@ -113,6 +116,7 @@ axes8:
 	title: $\Phi(x) \,- Region\, 4$
 	xlabel: $x$
 	ylabel: $\Phi(x)$
+	yscale: log
 axes9:
 	plots: 1
 	data:
@@ -141,4 +145,5 @@ axes10:
 	title: $\Phi(x) \,- Region\, 5$
 	xlabel: $x$
 	ylabel: $\Phi(x)$
-save_file: m_rpd_by_prev_zones_all_5zones.pdf
+	yscale: log
+save_file: m_rpd_by_prev_zones_all_5zones_log.pdf

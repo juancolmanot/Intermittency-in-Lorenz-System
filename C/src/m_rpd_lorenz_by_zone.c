@@ -85,8 +85,8 @@ int main(int argc, char *argv[]) {
     // Open files to complete M(x) and RPD(x) and erase their content.
     // ===============================================================================
     char file_m_all[256], file_rpd_all[256];
-    sprintf(file_m_all, "%s_m_all.dat", m_rpd_write_file);
-    sprintf(file_rpd_all, "%s_rpd_all.dat", m_rpd_write_file);
+    sprintf(file_m_all, "%s_prev_region_m_all.dat", m_rpd_write_file);
+    sprintf(file_rpd_all, "%sprev_region_rpd_all.dat", m_rpd_write_file);
     FILE *fm_all = fopen(file_m_all, "w"), *frpd_all = fopen(file_rpd_all, "w");
     for (unsigned int i = 0; i < rows; i++) {
         fprintf(fm_all, "%12.5LE %12.5LE\n", xreinj_sort[i], M_tot[i]);

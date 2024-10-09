@@ -101,6 +101,7 @@ int main(int argc, char *argv[]) {
         // ===============================================================================
         long double alpha = 0.0;
         alpha = (2.0 * mi - 1.0) / (1.0 - mi);
+        printf("subregion: %d - m: %Lf - alpha: %Lf\n", i, mi, alpha);
         long double *rpd_theo = calloc(n_region, sizeof(long double));
         long double xci = params.xc[i];
         // Normalize rpd.

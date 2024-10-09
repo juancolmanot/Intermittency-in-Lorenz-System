@@ -79,14 +79,14 @@ int main(int argc, char *argv[]) {
     // Reinjection parameters.
     // ===============================================================================
     double yf = 41.2861;
-    double clam = 1.85;
+    //double clam = 1.85;
 
     // ===============================================================================
     // Mapping count parameters.
     // ===============================================================================
-    unsigned int map_target_per_thread = 1000;
+    unsigned int map_target_per_thread = 2000;
     unsigned int total_map_target = map_target_per_thread * num_threads;
-    double ymap[total_map_target][2], zmap[total_map_target][2];
+    double ymap[total_map_target][2];//, zmap[total_map_target][2];
 
     // ===============================================================================
     // Integrate stationary state.
@@ -140,12 +140,12 @@ int main(int argc, char *argv[]) {
         // ===============================================================================
         // Arrays for interpolation and map.
         // ===============================================================================
-        long double xfit[n], yfit[n], zfit[n];
-        double yreg[2], zreg[2];
+        long double xfit[n], yfit[n];//, zfit[n];
+        double yreg[2];//, zreg[2];
         yreg[0] = yreg[1] = 0.0;
-        zreg[0] = zreg[1] = 0.0;
+        //zreg[0] = zreg[1] = 0.0;
         double xp = 0;
-        long double ciy[n], ciz[n];
+        long double ciy[n];//, ciz[n];
 
         // ===============================================================================
         // Fill first three points.
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
             int status = gsl_odeiv2_evolve_apply(e, c, s, &sys, &t, t_stationary, &h, x);
             xfit[i] = x[0];
             yfit[i] = x[1];
-            zfit[i] = x[2];
+            //zfit[i] = x[2];
             if (status != GSL_SUCCESS) {
                 printf("error initializing, return value=%d\n", status);
                 break;
@@ -176,28 +176,28 @@ int main(int argc, char *argv[]) {
             yfit[1] = yfit[2];
             yfit[2] = x[1];
 
-            zfit[0] = zfit[1];
-            zfit[1] = zfit[2];
-            zfit[2] = x[2];
+            //zfit[0] = zfit[1];
+            //zfit[1] = zfit[2];
+            //zfit[2] = x[2];
 
             if (xfit[0] < xp) {
                 if (xfit[1] > xp) {
                     quadratic_regression(xfit, yfit, 3, ciy);
-                    quadratic_regression(xfit, zfit, 3, ciz);
+                    //quadratic_regression(xfit, zfit, 3, ciz);
                     yreg[1] = (double)(ciy[0] * xp * xp + ciy[1] * xp + ciy[2]);
-                    zreg[1] = (double)(ciz[0] * xp * xp + ciz[1] * xp + ciz[2]);
-                    if (yreg[0] < yf + clam && yreg[0] > yf - clam){
-                        if (yreg[1] < yf + clam && yreg[1] > yf - clam){
-                            unsigned int index = thread_id * map_target_per_thread + local_map_count;
-                            ymap[index][0] = yreg[0];
-                            ymap[index][1] = yreg[1];
-                            zmap[index][0] = zreg[0];
-                            zmap[index][1] = zreg[1];
-                            local_map_count++;
-                        }
-                    }
+                    //zreg[1] = (double)(ciz[0] * xp * xp + ciz[1] * xp + ciz[2]);
+                    //if (yreg[0] - yf < 20.0 && yreg[0] - yf > -20.0){
+                    //    if (yreg[1] - yf < 20.0 && yreg[1] - yf > -20.0){
+                    unsigned int index = thread_id * map_target_per_thread + local_map_count;
+                    ymap[index][0] = yreg[0];
+                    ymap[index][1] = yreg[1];
+                            //zmap[index][0] = zreg[0];
+                            //zmap[index][1] = zreg[1];
+                    local_map_count++;
+//                        }
+//                    }
                     yreg[0] = yreg[1];
-                    zreg[0] = zreg[1];
+                    //zreg[0] = zreg[1];
                 }
             }
 
@@ -229,19 +229,11 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     // Write results to file.
     // ===============================================================================
-    for (unsigned int i = 0; i < total_map_target; i++) {
-        if (fabs(ymap[i][0] - 0.0) > 1e-2 && fabs(ymap[i][1] - 0.0) > 1e-2){
-            if (fabs(zmap[i][0]) - 0.0 > 1e-2 && fabs(zmap[i][1] - 0.0) > 1e-2) {
-                fprintf(f, "%5.5f %5.5f %5.5f %5.5f %5.5f %5.5f\n",
-                    ymap[i][0],
-                    ymap[i][1],
-                    ymap[i][0] - yf,
-                    ymap[i][1] - yf,
-                    zmap[i][0],
-                    zmap[i][1]
-                );
-            }
-        }
+    for (unsigned int i = 10; i < total_map_target; i++) {
+        fprintf(f, "%5.5f %5.5f\n",
+            ymap[i][0],
+            ymap[i][1]
+        );
     }
 
     // ===============================================================================

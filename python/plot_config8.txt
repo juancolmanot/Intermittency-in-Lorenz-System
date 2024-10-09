@@ -4,7 +4,7 @@ figsize: 6, 6
 axes1:
 	plots: 2
 	data:
-		file: ../datafiles/m_tn_lorenz_5reg.dat
+		file: ../datafiles/m_lorenz_numeric.dat
 		method: scatter
 		x_col: 0
 		y_col: 1
@@ -12,7 +12,7 @@ axes1:
 		color: black
 		dot_size: 1
 	data:
-		file: ../datafiles/m_tn_lorenz_5reg.dat
+		file: ../datafiles/lorenz_ub185_lb185_m_all.dat
 		method: scatter
 		x_col: 0
 		y_col: 2
@@ -23,27 +23,41 @@ axes1:
 	xlabel: $x$
 	ylabel: $M(x)$	
 axes2:
-	plots: 2
+	plots: 4
 	data:
-		file: ../datafiles/rpd_tn_lorenz_5reg.dat
+		file: ../datafiles/rpd_lorenz_numeric.dat
 		method: scatter
 		x_col: 0
 		y_col: 1
 		label: numeric
 		color: black
 		dot_size: 1
-		linewidth: 0.5
+		marker: ^
 	data:
-		file: ../datafiles/rpd_tn_lorenz_5reg.dat
+		file: ../datafiles/lorenz_ub185_lb185_rpd_0.dat
 		method: plot
-		x_col: 0
-		y_col: 2
+		x_col: 1
+		y_col: 3
 		label: theoric
 		color: red
-		dot_size: 1
-		linewidth: 0.5
+		linewidth: 1
+	data:
+		file: ../datafiles/lorenz_ub185_lb185_rpd_1.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		label:
+		color: red
+		linewidth: 1
+	data:
+		file: ../datafiles/lorenz_ub185_lb185_rpd_2.dat
+		method: plot
+		x_col: 1
+		y_col: 3
+		label:
+		color: red
+		linewidth: 1
 	title: $\Phi(x)- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
 	xlabel: $x$
 	ylabel: $\Phi(x)$
-	ylim: [0, 3]
-save_file: rpd_m_tn_lorenz_3.pdf
+save_file: m_rpd_lorenz_3reg_ub1.85_lb1.85.pdf

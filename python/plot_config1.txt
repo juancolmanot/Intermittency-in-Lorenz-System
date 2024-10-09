@@ -1,46 +1,27 @@
-total_axes: 2
-layout: 3, 1
-figsize: 6, 8
+total_axes: 1
+layout: 1, 1
+figsize: 6, 3
 axes1:
-	plots: 1
+	plots: 2
 	data:
-		file: ../datafiles/lorenz_trajectory.dat
-		method: plot
+		file: ../datafiles/local_map_rho164.dat
+		method: scatter
 		x_col: 0
 		y_col: 1
-		label: x
+		label:
 		color: black
 		dot_size: 1
-		linewidth: 0.5
-	title: $x- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
-	xlabel: $t$
-	ylabel: $x$
-axes2:
-	plots: 1
+		marker: .
 	data:
-		file: ../datafiles/lorenz_trajectory.dat
-		method: plot
-		x_col: 0
-		y_col: 2
-		label: y
-		color: black
+		file: ../datafiles/local_map_rho164.dat
+		method: scatter
+		x_col: 1
+		y_col: 1
+		label:
+		color: red
 		dot_size: 1
-		linewidth: 0.5
-	title: $y- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
-	xlabel: $t$
-	ylabel: $y$
-axes3:
-	plots: 1
-	data:
-		file: ../datafiles/lorenz_trajectory.dat
-		method: plot
-		x_col: 0
-		y_col: 3
-		label: z
-		color: black
-		dot_size: 1
-		linewidth: 0.5
-	title: $z- \, \sigma=10.0,\, \rho=166.07,\, \beta=8.0/3.0$
-	xlabel: $t$
-	ylabel: $z$
-save_file: lorenz_txyz.pdf
+		marker: .
+	title: local map
+	xlabel: $y(n)$
+	ylabel: $y(n+1)$
+save_file: local_map.pdf

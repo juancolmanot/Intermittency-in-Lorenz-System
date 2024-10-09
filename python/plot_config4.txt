@@ -4,10 +4,10 @@ figsize: 6, 3
 axes1:
 	plots: 1
 	data:
-		file: ../datafiles/reinjection_lorenz_gsl_omp.dat
+		file: ../datafiles/local_map_lorenz.dat
 		method: scatter
 		x_col: 0
-		y_col: 3
+		y_col: 1
 		label:
 		color: black
 		dot_size: 0.5
@@ -16,4 +16,4 @@ axes1:
 	xlabel: $y(n-1)$
 	ylabel: $y(n)$
 	yscale: linear
-save_file: yn_yn1_lorenz.pdf
+save_file: local_map_lorenz_1.pdf
